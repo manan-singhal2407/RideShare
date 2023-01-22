@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "799138818239",
+    "project_id": "car-sharing-833b4",
+    "storage_bucket": "car-sharing-833b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:799138818239:android:584a20394cadc0e8c3be0a",
+        "android_client_info": {
+          "package_name": "com.example.btp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "799138818239-8re6eal0qrd6v6dlk26qak6taia8sbk1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.btp",
+            "certificate_hash": "f4bd78af026e81184698b0eaba157b64604ea6cf"
+          }
+        },
+        {
+          "client_id": "799138818239-33rc0vtfgpde7q0rpfht1t10bknv1chk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADKEqwxHXWmy0CtmhDxlbEjBgW05gyKfQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "799138818239-33rc0vtfgpde7q0rpfht1t10bknv1chk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
