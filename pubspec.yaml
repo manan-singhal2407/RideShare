@@ -66,6 +66,14 @@ dependencies:
   shimmer: ^2.0.0
   pinput: ^2.2.21
 
+  google_maps_webservice: ^0.0.19
+  flutter_google_places: ^0.3.0
+
+  location: ^4.4.0
+  flutter_polyline_points: ^1.0.0
+  google_maps_flutter: ^2.1.9
+  geocoder2: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

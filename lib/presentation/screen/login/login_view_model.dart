@@ -1,3 +1,5 @@
+import 'package:btp/data/network/model/users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,7 @@ import '../../theme/color.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth = getIt<FirebaseAuth>();
+  final FirebaseFirestore _firebaseFirestore = getIt<FirebaseFirestore>();
 
   final BuildContext _context;
 
@@ -35,8 +38,28 @@ class LoginViewModel extends ChangeNotifier {
         verificationId: _verificationId!,
         smsCode: _otpCodeController.text,
       );
-      await _firebaseAuth.signInWithCredential(credential).then((value) {
-        showScaffoldMessenger(_context, 'Verified', successStateColor);
+      await _firebaseAuth.signInWithCredential(credential).then((value) async {
+        Users users = Users(
+          DateTime.now().millisecondsSinceEpoch,
+          '',
+          phoneNumberController.text.trim(),
+          '',
+          '',
+          _firebaseAuth.currentUser!.uid,
+          'active',
+          'user',
+        );
+        await _firebaseFirestore
+            .collection('Users')
+            .doc(_firebaseAuth.currentUser!.uid)
+            .set(users.toJson())
+            .then((value) {
+          Navigator.pushNamedAndRemoveUntil(
+            _context,
+            "/home_screen",
+            (r) => false,
+          );
+        });
       });
     } else {
       await _firebaseAuth.verifyPhoneNumber(
@@ -50,8 +73,30 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   _onVerificationCompleted(PhoneAuthCredential authCredential) async {
-    await _firebaseAuth.signInWithCredential(authCredential).then((value) {
-      showScaffoldMessenger(_context, 'Verified', successStateColor);
+    await _firebaseAuth
+        .signInWithCredential(authCredential)
+        .then((value) async {
+      Users users = Users(
+        DateTime.now().millisecondsSinceEpoch,
+        '',
+        phoneNumberController.text.trim(),
+        '',
+        '',
+        _firebaseAuth.currentUser!.uid,
+        'active',
+        'user',
+      );
+      await _firebaseFirestore
+          .collection('Users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .set(users.toJson())
+          .then((value) {
+        Navigator.pushNamedAndRemoveUntil(
+          _context,
+          "/home_screen",
+          (r) => false,
+        );
+      });
     });
   }
 

@@ -1,8 +1,9 @@
 import 'package:btp/presentation/base/injectable.dart';
-import 'package:btp/presentation/screen/auth/auth_page.dart';
+import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
-import 'package:btp/presentation/screen/login_verify/login_verify_page.dart';
-import 'package:btp/presentation/screen/register/register_page.dart';
+import 'package:btp/presentation/screen/maps.dart';
+import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
+import 'package:btp/presentation/screen/search/search_page.dart';
 import 'package:btp/presentation/screen/splash/splash_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -37,18 +38,21 @@ class MyApp extends StatelessWidget {
         ),
       ),
       initialRoute: '/splash_screen',
+      debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
         '/splash_screen': (context) => const SplashPage(),
-        '/auth_screen': (context) => const AuthPage(),
         '/login_screen': (context) => const LoginPage(),
-        '/register_screen': (context) => const RegisterPage(),
+        '/home_screen': (context) => const HomePage(),
+        '/maps_screen': (context) => Maps(),
       },
       onGenerateRoute: (settings) {
-        if (settings.name == '/login_verify_screen') {
-          final arguments = settings.arguments as String;
+        if (settings.name == '/search_screen') {
+          final arguments = settings.arguments as SearchScreenArguments;
           return MaterialPageRoute(
             builder: (context) {
-              return LoginVerifyPage(phoneNumber: arguments);
+              return SearchPage(
+                type: arguments.type,
+              );
             },
           );
         }

@@ -17,7 +17,7 @@ class SplashViewModel extends ChangeNotifier {
       if (user != null) {
         Navigator.pushReplacementNamed(_context, '/home_screen');
       } else {
-        Navigator.pushReplacementNamed(_context, '/auth_screen');
+        Navigator.pushReplacementNamed(_context, '/login_screen');
       }
     });
   }
