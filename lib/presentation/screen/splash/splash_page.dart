@@ -25,8 +25,8 @@ class SplashPage extends StatelessWidget {
                 elevation: 2,
                 child: Image.asset(
                   'assets/images/app_logo.png',
-                  width: 80,
-                  height: 80,
+                  width: 120,
+                  height: 120,
                 ),
               ),
             ),

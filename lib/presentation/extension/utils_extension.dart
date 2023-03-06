@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 String googleMapsApiKey = 'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24';
 
@@ -23,4 +24,20 @@ void showScaffoldMessenger(
       backgroundColor: backgroundColor,
     ),
   );
+}
+
+String getCurrencyFormattedNumber(int value) {
+  return NumberFormat.currency(
+    symbol: '\u{20B9}',
+    locale: 'HI',
+    decimalDigits: 0,
+  ).format(value);
+}
+
+String getNonCurrencyFormattedNumber(int value) {
+  return NumberFormat.currency(
+    symbol: '',
+    locale: 'HI',
+    decimalDigits: 0,
+  ).format(value);
 }

@@ -1,10 +1,18 @@
 import 'dart:async';
 
+import 'package:btp/data/network/model/rides.dart';
+import 'package:btp/domain/repositories/i_booking_repository.dart';
+import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/directions.dart' as direction;
+
+import '../../base/injectable.dart';
 
 class BookingViewModel extends ChangeNotifier {
+  final IBookingRepository _bookingRepository = getIt<IBookingRepository>();
+
   final BuildContext _context;
   final LatLng _pickupLatLng;
   final LatLng _destinationLatLng;
@@ -13,12 +21,19 @@ class BookingViewModel extends ChangeNotifier {
   final Map<PolylineId, Polyline> _polylines = {};
   final PolylinePoints _polylinePoints = PolylinePoints();
   Marker? _sourcePosition, _destinationPosition;
+  int _distanceBetweenSourceAndDestination = -100;
+  bool _isCarPoolingEnabled = false;
+  String? _timeTakenBetweenSourceAndDestination;
+
+  final TextEditingController _toleranceTimeController =
+      TextEditingController();
 
   BookingViewModel(
     this._context,
     this._pickupLatLng,
     this._destinationLatLng,
   ) {
+    _getDistanceBetweenSourceAndDestination();
     _getPolylinesBetweenSourceAndDestination();
     _getSourceAndDestinationMarker();
   }
@@ -30,6 +45,37 @@ class BookingViewModel extends ChangeNotifier {
   Marker? get sourcePosition => _sourcePosition;
 
   Marker? get destinationPosition => _destinationPosition;
+
+  int get distanceBetweenSourceAndDestination =>
+      _distanceBetweenSourceAndDestination;
+
+  String? get timeTakenBetweenSourceAndDestination =>
+      _timeTakenBetweenSourceAndDestination;
+
+  bool get isCarPoolingEnabled => _isCarPoolingEnabled;
+
+  TextEditingController get toleranceTimeController => _toleranceTimeController;
+
+  void _getDistanceBetweenSourceAndDestination() async {
+    direction.GoogleMapsDirections directionsApi =
+        direction.GoogleMapsDirections(
+      apiKey: googleMapsApiKey,
+    );
+    direction.DirectionsResponse response =
+        await directionsApi.directionsWithLocation(
+      direction.Location(
+          lat: _pickupLatLng.latitude, lng: _pickupLatLng.longitude),
+      direction.Location(
+          lat: _destinationLatLng.latitude, lng: _destinationLatLng.longitude),
+    );
+    if (response.isOkay) {
+      _distanceBetweenSourceAndDestination =
+          response.routes[0].legs[0].distance.value.toInt();
+      _timeTakenBetweenSourceAndDestination =
+          response.routes[0].legs[0].duration.text;
+      notifyListeners();
+    }
+  }
 
   void _getPolylinesBetweenSourceAndDestination() async {
     List<LatLng> polylineCoordinates = [];
@@ -96,5 +142,39 @@ class BookingViewModel extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  void onCarPoolingClicked() async {
+    _isCarPoolingEnabled = !_isCarPoolingEnabled;
+    _toleranceTimeController.text = '15';
+    notifyListeners();
+  }
+
+  void onBookSwiftClicked() async {
+    Rides rides = Rides(
+      DateTime.now().millisecondsSinceEpoch,
+      0,
+      'type1',
+      '',
+      '',
+      '',
+      'profileUrl',
+      'userName',
+      _isCarPoolingEnabled,
+      int.parse(_toleranceTimeController.text),
+      _distanceBetweenSourceAndDestination / 50,
+      _pickupLatLng.latitude,
+      _pickupLatLng.longitude,
+      _destinationLatLng.latitude,
+      _destinationLatLng.longitude,
+    );
+    await _bookingRepository.requestedNewRideToDatabase(rides).then((value) {
+      if (value.data != null) {
+
+      } else {
+
+      }
+      notifyListeners();
+    });
   }
 }

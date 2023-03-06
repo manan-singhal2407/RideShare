@@ -259,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'User Name',
+                            'Manan Singhal',
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
                                 color: primaryTextColor,
@@ -271,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            'Phone Number',
+                            '+917340334826',
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
                                 color: secondaryTextColor,

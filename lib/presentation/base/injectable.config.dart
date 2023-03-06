@@ -6,8 +6,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:btp/data/network/service/firebase_service.dart' as _i5;
-import 'package:btp/domain/di/app_module.dart' as _i6;
-import 'package:btp/domain/di/network_module.dart' as _i7;
+import 'package:btp/data/repositories/booking_repository.dart' as _i7;
+import 'package:btp/domain/di/app_module.dart' as _i8;
+import 'package:btp/domain/di/network_module.dart' as _i9;
+import 'package:btp/domain/repositories/i_booking_repository.dart' as _i6;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i4;
 import 'package:firebase_auth/firebase_auth.dart' as _i3;
 import 'package:get_it/get_it.dart' as _i1;
@@ -34,10 +36,11 @@ extension GetItInjectableX on _i1.GetIt {
       () => appModule.firebaseService,
       preResolve: true,
     );
+    gh.factory<_i6.IBookingRepository>(() => _i7.BookingRepository());
     return this;
   }
 }
 
-class _$AppModule extends _i6.AppModule {}
+class _$AppModule extends _i8.AppModule {}
 
-class _$NetworkModule extends _i7.NetworkModule {}
+class _$NetworkModule extends _i9.NetworkModule {}
