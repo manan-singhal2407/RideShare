@@ -14,7 +14,7 @@ class HomeViewModel extends ChangeNotifier {
   loc.LocationData? _currentPosition;
   final Completer<GoogleMapController?> _controller = Completer();
   String? _pickUpLocationAddress;
-  Marker? _sourcePosition, _destinationPosition;
+  Marker? _sourcePosition;
 
   HomeViewModel(this._context) {
     _getCurrentLocation();

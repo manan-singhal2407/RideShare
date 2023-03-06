@@ -1,4 +1,6 @@
 import 'package:btp/presentation/base/injectable.dart';
+import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
+import 'package:btp/presentation/screen/booking/booking_page.dart';
 import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
 import 'package:btp/presentation/screen/maps.dart';
@@ -52,6 +54,17 @@ class MyApp extends StatelessWidget {
             builder: (context) {
               return SearchPage(
                 type: arguments.type,
+                latLng: arguments.latLng,
+              );
+            },
+          );
+        } else if (settings.name == '/booking_screen') {
+          final arguments = settings.arguments as BookingScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return BookingPage(
+                pickupLatLng: arguments.pickupLatLng,
+                destinationLatLng: arguments.destinationLatLng,
               );
             },
           );

@@ -1,16 +1,21 @@
+import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
 import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
 import 'search_view_model.dart';
 
 class SearchPage extends StatefulWidget {
   final String type;
+  final LatLng latLng;
 
   const SearchPage({
     super.key,
     required this.type,
+    required this.latLng,
   });
 
   @override
@@ -84,13 +89,38 @@ class _SearchPageState extends State<SearchPage> {
                             title: Text(viewModel
                                 .searchedPredictions[index].description
                                 .toString()),
-                            onTap: () {
-                              Navigator.pop(
-                                context,
-                                viewModel.searchedPredictions[index],
-                              );
-                              // Select the prediction and close the search overlay
-                              // _selectPlace(viewModel.searchedPredictions.predictions[index].placeId);
+                            onTap: () async {
+                              if (widget.type == 'destination') {
+                                GoogleMapsPlaces googleMapsPlaces =
+                                GoogleMapsPlaces(
+                                  apiKey:
+                                  'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
+                                );
+                                PlacesDetailsResponse details =
+                                    await googleMapsPlaces
+                                    .getDetailsByPlaceId(
+                                      viewModel.searchedPredictions[index].placeId!,
+                                );
+                                LatLng latLng = LatLng(
+                                  (details
+                                      .result.geometry?.location.lat)!,
+                                  (details
+                                      .result.geometry?.location.lng)!,
+                                );
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/booking_screen',
+                                  arguments: BookingScreenArguments(
+                                    widget.latLng,
+                                    latLng,
+                                  ),
+                                );
+                              } else {
+                                Navigator.pop(
+                                  context,
+                                  viewModel.searchedPredictions[index],
+                                );
+                              }
                             },
                           );
                         },
