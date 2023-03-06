@@ -15,12 +15,20 @@ class SplashPage extends StatelessWidget {
           return Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            color: Colors.white,
             alignment: Alignment.center,
-            child: Image.asset(
-              'assets/images/app_logo.png',
-              width: 200,
-              height: 200,
+            color: Colors.white,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Material(
+                elevation: 2,
+                child: Image.asset(
+                  'assets/images/app_logo.png',
+                  width: 80,
+                  height: 80,
+                ),
+              ),
             ),
           );
         },

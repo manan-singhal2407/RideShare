@@ -28,7 +28,7 @@ class SearchViewModel extends ChangeNotifier {
     final predictions = await _searchedPlaces.autocomplete(
       searchQuery,
       language: 'en',
-      radius: 5000,
+      radius: 10000,
       location: Location(lat: 30.7191, lng: 76.7487),
       strictbounds: true,
     );

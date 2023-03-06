@@ -85,6 +85,10 @@ class _SearchPageState extends State<SearchPage> {
                                 .searchedPredictions[index].description
                                 .toString()),
                             onTap: () {
+                              Navigator.pop(
+                                context,
+                                viewModel.searchedPredictions[index],
+                              );
                               // Select the prediction and close the search overlay
                               // _selectPlace(viewModel.searchedPredictions.predictions[index].placeId);
                             },

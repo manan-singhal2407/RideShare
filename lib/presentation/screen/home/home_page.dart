@@ -4,6 +4,7 @@ import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
 import 'home_view_model.dart';
@@ -17,16 +18,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  BitmapDescriptor? markerIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(size: Size(48, 48)),
+      'assets/images/pick.png',
+    ).then((icon) {
+      markerIcon = icon;
+    });
+  }
 
   void _openDrawer() {
-    Navigator.pushNamed(
-      context,
-      '/search_screen',
-      arguments: SearchScreenArguments(
-        'pickup',
-      ),
-    );
-    // _scaffoldKey.currentState?.openDrawer();
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   void _closeDrawer() {
@@ -43,34 +49,136 @@ class _HomePageState extends State<HomePage> {
             key: _scaffoldKey,
             body: Stack(
               children: [
-                // GoogleMap(
-                //   zoomControlsEnabled: false,
-                //   initialCameraPosition: CameraPosition(
-                //     target: destLocation!,
-                //     zoom: 16,
-                //   ),
-                //   onCameraMove: (CameraPosition? position) {
-                //     if (destLocation != position!.target) {
-                //       setState(() {
-                //         destLocation = position.target;
-                //       });
-                //     }
-                //   },
-                //   onCameraIdle: () {
-                //     getAddressFromLatLng();
-                //   },
-                //   onTap: (latLng) {
-                //
-                //   },
-                //   onMapCreated: (GoogleMapController controller) {
-                //     _controller.complete(controller);
-                //   },
-                // ),
+                GoogleMap(
+                  zoomControlsEnabled: false,
+                  initialCameraPosition: CameraPosition(
+                    target: viewModel.pickUpLocation,
+                    zoom: 16,
+                  ),
+                  onCameraMove: (CameraPosition? position) {
+                    if (viewModel.pickUpLocation != position!.target) {
+                      viewModel.onCameraPositionChange(position.target);
+                    }
+                  },
+                  onCameraIdle: () {
+                    if (viewModel.sourcePosition == null) {
+                      viewModel.getAddressFromPickUpMovement();
+                    }
+                  },
+                  onMapCreated: (GoogleMapController controller) {
+                    viewModel.controller.complete(controller);
+                  },
+                  markers: {
+                    if (viewModel.sourcePosition != null)
+                      viewModel.sourcePosition!
+                  },
+                ),
+                if (viewModel.sourcePosition == null) ...[
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 35.0),
+                      child: Image.asset(
+                        'assets/images/pick.png',
+                        height: 45,
+                        width: 45,
+                      ),
+                    ),
+                  ),
+                ],
+                Positioned(
+                  top: 40,
+                  right: 20,
+                  left: 20,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _openDrawer,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Icon(
+                              Icons.menu,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/search_screen',
+                              arguments: SearchScreenArguments(
+                                'pickup',
+                              ),
+                            ).then((result) async {
+                              if (result != null) {
+                                var prediction = result as Prediction;
+                                GoogleMapsPlaces googleMapsPlaces =
+                                    GoogleMapsPlaces(
+                                  apiKey:
+                                      'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
+                                );
+                                PlacesDetailsResponse details =
+                                    await googleMapsPlaces.getDetailsByPlaceId(
+                                  prediction.placeId!,
+                                );
+                                LatLng latLng = LatLng(
+                                  (details.result.geometry?.location.lat)!,
+                                  (details.result.geometry?.location.lng)!,
+                                );
+                                Marker marker = Marker(
+                                  markerId: MarkerId(prediction.placeId!),
+                                  position: latLng,
+                                  infoWindow: InfoWindow(
+                                    title: prediction.description,
+                                    snippet: details.result.formattedAddress,
+                                  ),
+                                );
+                                viewModel.addSourcePositionMarker(
+                                    latLng, marker);
+                              }
+                            });
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              alignment: Alignment.centerLeft,
+                              height: 50,
+                              child: Text(
+                                viewModel.pickUpLocationAddress ??
+                                    'Select pickup location',
+                                style: GoogleFonts.openSans(
+                                  textStyle: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: _openDrawer,
-              child: const Icon(Icons.menu),
             ),
             drawer: Drawer(
               child: ListView(
@@ -142,7 +250,8 @@ class _HomePageState extends State<HomePage> {
                   ListTile(
                     onTap: () {
                       _closeDrawer();
-                      showScaffoldMessenger(context, 'My Rides', primaryTextColor);
+                      showScaffoldMessenger(
+                          context, 'My Rides', primaryTextColor);
                     },
                     leading: Container(
                       width: 40,
@@ -173,7 +282,8 @@ class _HomePageState extends State<HomePage> {
                   ListTile(
                     onTap: () {
                       _closeDrawer();
-                      showScaffoldMessenger(context, 'Settings', primaryTextColor);
+                      showScaffoldMessenger(
+                          context, 'Settings', primaryTextColor);
                     },
                     leading: Container(
                       width: 40,
@@ -204,7 +314,8 @@ class _HomePageState extends State<HomePage> {
                   ListTile(
                     onTap: () {
                       _closeDrawer();
-                      showScaffoldMessenger(context, 'Support', primaryTextColor);
+                      showScaffoldMessenger(
+                          context, 'Support', primaryTextColor);
                     },
                     leading: Container(
                       width: 40,
