@@ -1,6 +1,7 @@
 import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
 import 'package:btp/presentation/theme/color.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -119,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                                 onTap: () {
                                   Navigator.pushNamed(
                                     context,
-                                    '/search_screen',
+                                    '/rider/search_screen',
                                     arguments: SearchScreenArguments(
                                       'pickup',
                                       viewModel.pickUpLocation,
@@ -195,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.pushNamed(
                         context,
-                        '/search_screen',
+                        '/rider/search_screen',
                         arguments: SearchScreenArguments(
                           'destination',
                           viewModel.pickUpLocation,
@@ -229,49 +230,96 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             drawer: Drawer(
-              child: ListView(
+              child: Column(
                 children: [
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: Colors.green,
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        const SizedBox(
+                          height: 16,
                         ),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Manan Singhal',
-                            style: GoogleFonts.openSans(
-                              textStyle: const TextStyle(
-                                color: primaryTextColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.green,
+                              ),
+                              child: const Icon(
+                                Icons.person_rounded,
+                                size: 32,
                               ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            const SizedBox(
+                              width: 12,
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Manan Singhal',
+                                  style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(
+                                      color: primaryTextColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  '+917340334826',
+                                  style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(
+                                      color: secondaryTextColor,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        const Divider(
+                          height: 0,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        ListTile(
+                          onTap: () {
+                            _closeDrawer();
+                            showScaffoldMessenger(
+                                context, 'My Rides', primaryTextColor);
+                          },
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.grey.shade500,
+                            ),
+                            child: const Icon(
+                              Icons.timelapse_rounded,
+                              size: 24,
+                              color: Colors.white,
+                            ),
                           ),
-                          Text(
-                            '+917340334826',
+                          title: Text(
+                            'My Rides',
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
                                 color: secondaryTextColor,
@@ -282,113 +330,104 @@ class _HomePageState extends State<HomePage> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            _closeDrawer();
+                            showScaffoldMessenger(
+                                context, 'Settings', primaryTextColor);
+                          },
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.red.shade500,
+                            ),
+                            child: const Icon(
+                              Icons.settings_rounded,
+                              size: 24,
+                              color: Colors.white,
+                            ),
+                          ),
+                          title: Text(
+                            'Settings',
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: secondaryTextColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () async {
+                            _closeDrawer();
+                            await FirebaseAuth.instance.signOut().then((value) {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/login_screen',
+                                    (r) => false,
+                              );
+                            });
+                          },
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.orange.shade500,
+                            ),
+                            child: const Icon(
+                              Icons.support_rounded,
+                              size: 24,
+                              color: Colors.white,
+                            ),
+                          ),
+                          title: Text(
+                            'Support',
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: secondaryTextColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: viewModel.openCaptainVerificationPage,
+                    child: Container(
+                      height: 50,
+                      color: shimmerBaseColor,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            'Become a Driver',
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  const Divider(
-                    height: 0,
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  ListTile(
-                    onTap: () {
-                      _closeDrawer();
-                      showScaffoldMessenger(
-                          context, 'My Rides', primaryTextColor);
-                    },
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: Colors.grey.shade500,
-                      ),
-                      child: const Icon(
-                        Icons.timelapse_rounded,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      'My Rides',
-                      style: GoogleFonts.openSans(
-                        textStyle: const TextStyle(
-                          color: secondaryTextColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      _closeDrawer();
-                      showScaffoldMessenger(
-                          context, 'Settings', primaryTextColor);
-                    },
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: Colors.red.shade500,
-                      ),
-                      child: const Icon(
-                        Icons.settings_rounded,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      'Settings',
-                      style: GoogleFonts.openSans(
-                        textStyle: const TextStyle(
-                          color: secondaryTextColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      _closeDrawer();
-                      showScaffoldMessenger(
-                          context, 'Support', primaryTextColor);
-                    },
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: Colors.orange.shade500,
-                      ),
-                      child: const Icon(
-                        Icons.support_rounded,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      'Support',
-                      style: GoogleFonts.openSans(
-                        textStyle: const TextStyle(
-                          color: secondaryTextColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

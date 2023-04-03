@@ -3,7 +3,6 @@ import 'package:btp/presentation/screen/booking/arguments/booking_screen_argumen
 import 'package:btp/presentation/screen/booking/booking_page.dart';
 import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
-import 'package:btp/presentation/screen/maps.dart';
 import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
 import 'package:btp/presentation/screen/search/search_page.dart';
 import 'package:btp/presentation/screen/splash/splash_page.dart';
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
         textTheme: const TextTheme(
-          headline1: TextStyle(
+          displayLarge: TextStyle(
             fontWeight: FontWeight.normal,
             fontSize: 24.0,
           ),
@@ -44,11 +43,10 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/splash_screen': (context) => const SplashPage(),
         '/login_screen': (context) => const LoginPage(),
-        '/home_screen': (context) => const HomePage(),
-        '/maps_screen': (context) => Maps(),
+        '/rider/home_screen': (context) => const HomePage(),
       },
       onGenerateRoute: (settings) {
-        if (settings.name == '/search_screen') {
+        if (settings.name == '/rider/search_screen') {
           final arguments = settings.arguments as SearchScreenArguments;
           return MaterialPageRoute(
             builder: (context) {
@@ -58,7 +56,7 @@ class MyApp extends StatelessWidget {
               );
             },
           );
-        } else if (settings.name == '/booking_screen') {
+        } else if (settings.name == '/rider/booking_screen') {
           final arguments = settings.arguments as BookingScreenArguments;
           return MaterialPageRoute(
             builder: (context) {

@@ -42,7 +42,7 @@ class SplashViewModel extends ChangeNotifier {
   void _checkIfUserLoggedIn() {
     _firebaseAuth.authStateChanges().listen((User? user) {
       if (user != null) {
-        Navigator.pushReplacementNamed(_context, '/home_screen');
+        Navigator.pushReplacementNamed(_context, '/rider/home_screen');
       } else {
         Navigator.pushReplacementNamed(_context, '/login_screen');
       }

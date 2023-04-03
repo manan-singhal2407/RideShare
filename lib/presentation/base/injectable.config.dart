@@ -5,10 +5,14 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:btp/data/cache/database/dao/driver_dao.dart' as _i10;
+import 'package:btp/data/cache/database/dao/users_dao.dart' as _i9;
+import 'package:btp/data/cache/database/local_database.dart' as _i8;
 import 'package:btp/data/network/service/firebase_service.dart' as _i5;
 import 'package:btp/data/repositories/booking_repository.dart' as _i7;
-import 'package:btp/domain/di/app_module.dart' as _i8;
-import 'package:btp/domain/di/network_module.dart' as _i9;
+import 'package:btp/domain/di/app_module.dart' as _i11;
+import 'package:btp/domain/di/cache_module.dart' as _i13;
+import 'package:btp/domain/di/network_module.dart' as _i12;
 import 'package:btp/domain/repositories/i_booking_repository.dart' as _i6;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i4;
 import 'package:firebase_auth/firebase_auth.dart' as _i3;
@@ -30,6 +34,7 @@ extension GetItInjectableX on _i1.GetIt {
     );
     final networkModule = _$NetworkModule();
     final appModule = _$AppModule();
+    final cacheModule = _$CacheModule();
     gh.factory<_i3.FirebaseAuth>(() => networkModule.firebaseAuth);
     gh.factory<_i4.FirebaseFirestore>(() => networkModule.firebaseFirestore);
     await gh.factoryAsync<_i5.FirebaseService>(
@@ -37,10 +42,20 @@ extension GetItInjectableX on _i1.GetIt {
       preResolve: true,
     );
     gh.factory<_i6.IBookingRepository>(() => _i7.BookingRepository());
+    await gh.factoryAsync<_i8.LocalDatabase>(
+      () => cacheModule.localDatabase,
+      preResolve: true,
+    );
+    gh.factory<_i9.UsersDao>(
+        () => cacheModule.usersDao(gh<_i8.LocalDatabase>()));
+    gh.factory<_i10.DriverDao>(
+        () => cacheModule.adsRulesDao(gh<_i8.LocalDatabase>()));
     return this;
   }
 }
 
-class _$AppModule extends _i8.AppModule {}
+class _$AppModule extends _i11.AppModule {}
 
-class _$NetworkModule extends _i9.NetworkModule {}
+class _$NetworkModule extends _i12.NetworkModule {}
+
+class _$CacheModule extends _i13.CacheModule {}

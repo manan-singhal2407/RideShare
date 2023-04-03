@@ -1,3 +1,4 @@
+import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_webservice/places.dart';
 
@@ -7,7 +8,7 @@ class SearchViewModel extends ChangeNotifier {
   final TextEditingController _searchQueryController = TextEditingController();
   late List<Prediction> _searchedPredictions = [];
   final _searchedPlaces = GoogleMapsPlaces(
-    apiKey: 'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
+    apiKey: googleMapsApiKey,
   );
 
   SearchViewModel(this._context) {

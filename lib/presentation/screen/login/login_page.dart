@@ -63,6 +63,34 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(
                             width: 10,
                           ),
+                          Expanded(
+                            child: TextField(
+                              controller: viewModel.nameController,
+                              keyboardType: TextInputType.name,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Name",
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    Container(
+                      height: 55,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: 10,
+                          ),
                           SizedBox(
                             width: 40,
                             child: TextField(

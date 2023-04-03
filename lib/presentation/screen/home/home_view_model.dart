@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -48,7 +49,7 @@ class HomeViewModel extends ChangeNotifier {
     GeoData data = await Geocoder2.getDataFromCoordinates(
       latitude: _pickUpLocation.latitude,
       longitude: _pickUpLocation.longitude,
-      googleMapApiKey: 'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
+      googleMapApiKey: googleMapsApiKey,
     );
     _pickUpLocationAddress = data.address;
     notifyListeners();
@@ -69,5 +70,10 @@ class HomeViewModel extends ChangeNotifier {
     _sourcePosition = marker;
     notifyListeners();
     getAddressFromPickUpMovement();
+  }
+
+  void openCaptainVerificationPage() async {
+
+    notifyListeners();
   }
 }

@@ -4,9 +4,16 @@ class Users {
   late String phoneNumber;
   late String profileUrl;
   late String userName;
-  late String userId;
+  late String userUid;
   late String status;
   late String role;
+  late num totalRides;
+  late num totalFare;
+  late num sharedRides;
+  late num totalAmountSaved;
+  late num tolerance;
+  late num amountNeedToSave;
+  late bool isSharingOn;
 
   Users(
     this.createdAt,
@@ -14,9 +21,16 @@ class Users {
     this.phoneNumber,
     this.profileUrl,
     this.userName,
-    this.userId,
+    this.userUid,
     this.status,
     this.role,
+    this.totalRides,
+    this.totalFare,
+    this.sharedRides,
+    this.totalAmountSaved,
+    this.tolerance,
+    this.amountNeedToSave,
+    this.isSharingOn,
   );
 
   Users.fromJson(Map<String, dynamic> map) {
@@ -25,9 +39,16 @@ class Users {
     phoneNumber = map['phoneNumber'];
     profileUrl = map['profileUrl'];
     userName = map['userName'];
-    userId = map['userId'];
+    userUid = map['userUid'];
     status = map['status'];
     role = map['role'];
+    totalRides = map['totalRides'];
+    totalFare = map['totalFare'];
+    sharedRides = map['sharedRides'];
+    totalAmountSaved = map['totalAmountSaved'];
+    tolerance = map['tolerance'];
+    amountNeedToSave = map['amountNeedToSave'];
+    isSharingOn = map['isSharingOn'];
   }
 
   Map<String, dynamic> toJson() {
@@ -37,9 +58,16 @@ class Users {
       'phoneNumber': phoneNumber,
       'profileUrl': profileUrl,
       'userName': userName,
-      'userId': userId,
+      'userUid': userUid,
       'status': status,
       'role': role,
+      'totalRides': totalRides,
+      'totalFare': totalFare,
+      'sharedRides': sharedRides,
+      'totalAmountSaved': totalAmountSaved,
+      'tolerance': tolerance,
+      'amountNeedToSave': amountNeedToSave,
+      'isSharingOn': isSharingOn,
     };
   }
 }

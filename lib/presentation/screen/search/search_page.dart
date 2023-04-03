@@ -109,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
                                 );
                                 Navigator.pushReplacementNamed(
                                   context,
-                                  '/booking_screen',
+                                  '/rider/booking_screen',
                                   arguments: BookingScreenArguments(
                                     widget.latLng,
                                     latLng,

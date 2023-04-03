@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
    <application
-        android:label="btp"
+        android:label="RideShare"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
