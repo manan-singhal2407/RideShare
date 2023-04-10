@@ -132,9 +132,9 @@ class Rides {
       'toleranceByUser2': toleranceByUser2,
       'amountNeedToSaveForUser1': amountNeedToSaveForUser1,
       'amountNeedToSaveForUser2': amountNeedToSaveForUser2,
-      'user1': user1?.toJson(),
-      'user2': user2?.toJson(),
-      'driver': driver?.toJson(),
+      'User1': user1?.toJson(),
+      'User2': user2?.toJson(),
+      'Driver': driver?.toJson(),
     };
   }
 }

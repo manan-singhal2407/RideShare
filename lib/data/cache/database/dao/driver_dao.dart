@@ -9,4 +9,7 @@ abstract class DriverDao {
 
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertDriverEntity(DriverEntity driverEntity);
+
+  @Query('DELETE FROM DriverEntity')
+  Future<void> clearAllDriverEntity();
 }

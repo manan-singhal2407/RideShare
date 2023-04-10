@@ -184,6 +184,7 @@ class BookingViewModel extends ChangeNotifier {
       null,
       null,
     );
+    // todo add request to driver and user table as well
     await _bookingRepository.requestedNewRideToDatabase(rides).then((value) {
       if (value.data != null) {
 

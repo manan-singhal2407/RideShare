@@ -1,26 +1,13 @@
 import 'dart:async';
 
-import 'package:btp/data/cache/database/dao/driver_dao.dart';
-import 'package:btp/data/cache/database/entities/users_entity.dart';
-import 'package:btp/data/network/model/driver.dart';
-import 'package:btp/data/network/model/users.dart';
 import 'package:btp/presentation/extension/utils_extension.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
 
-import '../../../data/cache/database/dao/users_dao.dart';
-import '../../../domain/extension/model_extension.dart';
-import '../../base/injectable.dart';
-
-class HomeViewModel extends ChangeNotifier {
-  final UsersDao _usersDao = getIt<UsersDao>();
-  final DriverDao _driverDao = getIt<DriverDao>();
-  final FirebaseFirestore _firebaseFirestore = getIt<FirebaseFirestore>();
-
+class DriverHomeViewModel extends ChangeNotifier {
   final BuildContext _context;
 
   late LatLng _pickUpLocation = const LatLng(30.7333, 76.7794);
@@ -30,7 +17,7 @@ class HomeViewModel extends ChangeNotifier {
   String? _pickUpLocationAddress;
   Marker? _sourcePosition;
 
-  HomeViewModel(this._context) {
+  DriverHomeViewModel(this._context) {
     _getCurrentLocation();
   }
 
@@ -85,54 +72,7 @@ class HomeViewModel extends ChangeNotifier {
     getAddressFromPickUpMovement();
   }
 
-  void openCaptainVerificationPage() async {
-    await _usersDao.getUsersEntityInfo().then((value) async {
-      if (value.isNotEmpty) {
-        UsersEntity usersEntity = value[0];
-        Driver driver = Driver(
-          DateTime.now().millisecondsSinceEpoch,
-          DateTime.now().millisecondsSinceEpoch + 3600000,
-          '',
-          '',
-          '',
-          usersEntity.phoneNumber,
-          usersEntity.emailId,
-          usersEntity.userName,
-          usersEntity.userUid,
-          'active',
-          'type1',
-          'RJ14 PE 7894',
-          4.5,
-          0,
-          0,
-          0,
-          true,
-          true,
-          _currentPosition != null ? _currentPosition!.latitude! : 0,
-          _currentPosition != null ? _currentPosition!.longitude! : 0,
-        );
-        usersEntity.role = 'driver';
-        await _usersDao.insertUsersEntity(usersEntity);
-        await _firebaseFirestore
-            .collection('Users')
-            .doc(usersEntity.userUid)
-            .update({'role' : 'driver'});
-        await _firebaseFirestore
-            .collection('Driver')
-            .doc(usersEntity.userUid)
-            .set(driver.toJson())
-            .then((value) async {
-          await _driverDao
-              .insertDriverEntity(convertDriverToDriverEntity(driver))
-              .then((value) {
-            Navigator.pushNamedAndRemoveUntil(
-              _context,
-              '/driver_home_screen',
-              (r) => false,
-            );
-          });
-        });
-      }
-    });
+  void logoutDriver() async {
+    // todo clear all tables data
   }
 }

@@ -9,4 +9,7 @@ abstract class UsersDao {
 
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertUsersEntity(UsersEntity usersEntity);
+
+  @Query('DELETE FROM UsersEntity')
+  Future<void> clearAllUsersEntity();
 }

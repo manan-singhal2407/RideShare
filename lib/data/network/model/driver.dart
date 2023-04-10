@@ -17,6 +17,7 @@ class Driver {
   late num sharedRides;
   late bool isSharingOn;
   late bool isDrivingOn;
+  // todo add person count or single or double person sitting key-value pair
   late double currentLatitude;
   late double currentLongitude;
 

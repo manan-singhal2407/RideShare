@@ -164,6 +164,11 @@ class _$UsersDao extends UsersDao {
   }
 
   @override
+  Future<void> clearAllUsersEntity() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM UsersEntity');
+  }
+
+  @override
   Future<void> insertUsersEntity(UsersEntity usersEntity) async {
     await _usersEntityInsertionAdapter.insert(
         usersEntity, OnConflictStrategy.replace);
@@ -233,6 +238,11 @@ class _$DriverDao extends DriverDao {
             (row['isDrivingOn'] as int) != 0,
             row['currentLatitude'] as double,
             row['currentLongitude'] as double));
+  }
+
+  @override
+  Future<void> clearAllDriverEntity() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM DriverEntity');
   }
 
   @override

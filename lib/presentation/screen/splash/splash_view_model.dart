@@ -1,11 +1,12 @@
 import 'package:location/location.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../domain/enums/account_type_enum.dart';
+import '../../../domain/repositories/i_splash_repository.dart';
 import '../../base/injectable.dart';
 
 class SplashViewModel extends ChangeNotifier {
-  final FirebaseAuth _firebaseAuth = getIt<FirebaseAuth>();
+  final ISplashRepository _splashRepository = getIt<ISplashRepository>();
 
   final BuildContext _context;
 
@@ -40,10 +41,13 @@ class SplashViewModel extends ChangeNotifier {
   }
 
   void _checkIfUserLoggedIn() {
-    _firebaseAuth.authStateChanges().listen((User? user) {
-      if (user != null) {
+    _splashRepository.checkIfUserIsADriver().then((value) {
+      AccountTypeEnum accountTypeEnum = value.data as AccountTypeEnum;
+      if (accountTypeEnum == AccountTypeEnum.user) {
         Navigator.pushReplacementNamed(_context, '/rider/home_screen');
-      } else {
+      } else if (accountTypeEnum == AccountTypeEnum.driver) {
+        Navigator.pushReplacementNamed(_context, '/driver_home_screen');
+      } else if (accountTypeEnum == AccountTypeEnum.latest) {
         Navigator.pushReplacementNamed(_context, '/login_screen');
       }
     });
