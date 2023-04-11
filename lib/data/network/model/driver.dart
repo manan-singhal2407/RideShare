@@ -17,9 +17,11 @@ class Driver {
   late num sharedRides;
   late bool isSharingOn;
   late bool isDrivingOn;
-  // todo add person count or single or double person sitting key-value pair
+  late bool isSinglePersonInCar;
+  late bool isDoublePersonInCar;
   late double currentLatitude;
   late double currentLongitude;
+  late String currentRideId;
 
   Driver(
     this.requestedAt,
@@ -40,8 +42,11 @@ class Driver {
     this.sharedRides,
     this.isSharingOn,
     this.isDrivingOn,
+    this.isSinglePersonInCar,
+    this.isDoublePersonInCar,
     this.currentLatitude,
     this.currentLongitude,
+    this.currentRideId,
   );
 
   Driver.fromJson(Map<String, dynamic> map) {
@@ -63,8 +68,11 @@ class Driver {
     sharedRides = map['sharedRides'];
     isSharingOn = map['isSharingOn'];
     isDrivingOn = map['isDrivingOn'];
+    isSinglePersonInCar = map['isSinglePersonInCar'];
+    isDoublePersonInCar = map['isDoublePersonInCar'];
     currentLatitude = map['currentLatitude'];
     currentLongitude = map['currentLongitude'];
+    currentRideId = map['currentRideId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -87,8 +95,11 @@ class Driver {
       'sharedRides': sharedRides,
       'isSharingOn': isSharingOn,
       'isDrivingOn': isDrivingOn,
+      'isSinglePersonInCar': isSinglePersonInCar,
+      'isDoublePersonInCar': isDoublePersonInCar,
       'currentLatitude': currentLatitude,
       'currentLongitude': currentLongitude,
+      'currentRideId': currentRideId,
     };
   }
 }

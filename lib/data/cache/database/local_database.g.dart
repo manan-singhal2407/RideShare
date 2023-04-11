@@ -89,7 +89,7 @@ class _$LocalDatabase extends LocalDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, PRIMARY KEY (`createdAt`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, PRIMARY KEY (`requestedAt`))');
+            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -202,8 +202,11 @@ class _$DriverDao extends DriverDao {
                   'sharedRides': item.sharedRides,
                   'isSharingOn': item.isSharingOn ? 1 : 0,
                   'isDrivingOn': item.isDrivingOn ? 1 : 0,
+                  'isSinglePersonInCar': item.isSinglePersonInCar ? 1 : 0,
+                  'isDoublePersonInCar': item.isDoublePersonInCar ? 1 : 0,
                   'currentLatitude': item.currentLatitude,
-                  'currentLongitude': item.currentLongitude
+                  'currentLongitude': item.currentLongitude,
+                  'currentRideId': item.currentRideId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -236,8 +239,11 @@ class _$DriverDao extends DriverDao {
             row['sharedRides'] as int,
             (row['isSharingOn'] as int) != 0,
             (row['isDrivingOn'] as int) != 0,
+            (row['isSinglePersonInCar'] as int) != 0,
+            (row['isDoublePersonInCar'] as int) != 0,
             row['currentLatitude'] as double,
-            row['currentLongitude'] as double));
+            row['currentLongitude'] as double,
+            row['currentRideId'] as String));
   }
 
   @override

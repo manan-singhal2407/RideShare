@@ -63,7 +63,10 @@ DriverEntity convertDriverToDriverEntity(Driver driver) {
     driver.sharedRides.toInt(),
     driver.isSharingOn,
     driver.isDrivingOn,
+    driver.isSinglePersonInCar,
+    driver.isDoublePersonInCar,
     driver.currentLatitude,
     driver.currentLongitude,
+    driver.currentRideId,
   );
 }

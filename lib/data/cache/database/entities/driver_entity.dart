@@ -21,8 +21,11 @@ class DriverEntity {
   late int sharedRides;
   late bool isSharingOn;
   late bool isDrivingOn;
+  late bool isSinglePersonInCar;
+  late bool isDoublePersonInCar;
   late double currentLatitude;
   late double currentLongitude;
+  late String currentRideId;
 
   DriverEntity(
     this.requestedAt,
@@ -43,7 +46,10 @@ class DriverEntity {
     this.sharedRides,
     this.isSharingOn,
     this.isDrivingOn,
+    this.isSinglePersonInCar,
+    this.isDoublePersonInCar,
     this.currentLatitude,
     this.currentLongitude,
+    this.currentRideId,
   );
 }

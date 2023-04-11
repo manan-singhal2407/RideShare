@@ -1,11 +1,7 @@
 import 'package:btp/presentation/extension/utils_extension.dart';
-import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
 import 'package:btp/presentation/theme/color.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
 import 'driver_home_view_model.dart';
@@ -41,43 +37,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 Expanded(
                   child: Stack(
                     children: [
-                      GoogleMap(
-                        zoomControlsEnabled: false,
-                        initialCameraPosition: CameraPosition(
-                          target: viewModel.pickUpLocation,
-                          zoom: 16,
-                        ),
-                        onCameraMove: (CameraPosition? position) {
-                          if (viewModel.pickUpLocation != position!.target) {
-                            viewModel.onCameraPositionChange(position.target);
-                          }
-                        },
-                        onCameraIdle: () {
-                          if (viewModel.sourcePosition == null) {
-                            viewModel.getAddressFromPickUpMovement();
-                          }
-                        },
-                        onMapCreated: (GoogleMapController controller) {
-                          viewModel.controller.complete(controller);
-                        },
-                        markers: {
-                          if (viewModel.sourcePosition != null)
-                            viewModel.sourcePosition!
-                        },
-                      ),
-                      if (viewModel.sourcePosition == null) ...[
-                        Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 35.0),
-                            child: Image.asset(
-                              'assets/images/pick.png',
-                              height: 45,
-                              width: 45,
-                            ),
-                          ),
-                        ),
-                      ],
                       Positioned(
                         top: 40,
                         right: 20,
@@ -100,119 +59,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/rider/search_screen',
-                                    arguments: SearchScreenArguments(
-                                      'pickup',
-                                      viewModel.pickUpLocation,
-                                    ),
-                                  ).then((result) async {
-                                    if (result != null) {
-                                      var prediction = result as Prediction;
-                                      GoogleMapsPlaces googleMapsPlaces =
-                                          GoogleMapsPlaces(
-                                        apiKey:
-                                            'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
-                                      );
-                                      PlacesDetailsResponse details =
-                                          await googleMapsPlaces
-                                              .getDetailsByPlaceId(
-                                        prediction.placeId!,
-                                      );
-                                      LatLng latLng = LatLng(
-                                        (details
-                                            .result.geometry?.location.lat)!,
-                                        (details
-                                            .result.geometry?.location.lng)!,
-                                      );
-                                      Marker marker = Marker(
-                                        markerId: MarkerId(prediction.placeId!),
-                                        position: latLng,
-                                        infoWindow: InfoWindow(
-                                          title: prediction.description,
-                                          snippet:
-                                              details.result.formattedAddress,
-                                        ),
-                                      );
-                                      viewModel.addSourcePositionMarker(
-                                          latLng, marker);
-                                    }
-                                  });
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                    alignment: Alignment.centerLeft,
-                                    height: 50,
-                                    child: Text(
-                                      viewModel.pickUpLocationAddress ??
-                                          'Enter pickup location',
-                                      style: GoogleFonts.openSans(
-                                        textStyle: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
                           ],
                         ),
                       ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/rider/search_screen',
-                        arguments: SearchScreenArguments(
-                          'destination',
-                          viewModel.pickUpLocation,
-                        ),
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                        alignment: Alignment.centerLeft,
-                        height: 50,
-                        child: Text(
-                          'Enter drop location',
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -238,10 +88,16 @@ class _DriverHomePageState extends State<DriverHomePage> {
                                 borderRadius: BorderRadius.circular(25),
                                 color: Colors.green,
                               ),
-                              child: const Icon(
-                                Icons.person_rounded,
-                                size: 32,
-                              ),
+                              child: viewModel.driverProfileUrl == ''
+                                  ? const Icon(
+                                      Icons.person_rounded,
+                                      size: 32,
+                                    )
+                                  : Image.network(
+                                      viewModel.driverProfileUrl,
+                                      width: 32,
+                                      height: 32,
+                                    ),
                             ),
                             const SizedBox(
                               width: 12,
@@ -251,7 +107,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Driver Name',
+                                  viewModel.driverName,
                                   style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(
                                       color: primaryTextColor,
@@ -263,7 +119,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  'Driver Number',
+                                  viewModel.driverPhoneNumber,
                                   style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(
                                       color: secondaryTextColor,
@@ -388,14 +244,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         ListTile(
                           onTap: () async {
                             _closeDrawer();
-                            // todo clear all floor database
-                            await FirebaseAuth.instance.signOut().then((value) {
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                '/login_screen',
-                                (r) => false,
-                              );
-                            });
+                            viewModel.logoutDriver();
                           },
                           leading: Container(
                             width: 40,

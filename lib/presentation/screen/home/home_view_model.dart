@@ -108,15 +108,18 @@ class HomeViewModel extends ChangeNotifier {
           0,
           true,
           true,
+          false,
+          false,
           _currentPosition != null ? _currentPosition!.latitude! : 0,
           _currentPosition != null ? _currentPosition!.longitude! : 0,
+          '',
         );
         usersEntity.role = 'driver';
         await _usersDao.insertUsersEntity(usersEntity);
         await _firebaseFirestore
             .collection('Users')
             .doc(usersEntity.userUid)
-            .update({'role' : 'driver'});
+            .update({'role': 'driver'});
         await _firebaseFirestore
             .collection('Driver')
             .doc(usersEntity.userUid)

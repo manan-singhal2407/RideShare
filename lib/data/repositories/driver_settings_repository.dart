@@ -35,7 +35,7 @@ class DriverSettingsRepository implements IDriverSettingsRepository {
         .doc(_firebaseAuth.currentUser?.uid)
         .get()
         .then((value) async {
-      driver = value.data() as Driver;
+      driver = Driver.fromJson(value.data()!);
       await _driverDao.insertDriverEntity(convertDriverToDriverEntity(driver!));
     });
     return DataState.success(driver);
