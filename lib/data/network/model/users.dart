@@ -2,6 +2,7 @@ class Users {
   late num createdAt;
   late String emailId;
   late String phoneNumber;
+  late String fullPhoneNumber;
   late String profileUrl;
   late String userName;
   late String userUid;
@@ -19,6 +20,7 @@ class Users {
     this.createdAt,
     this.emailId,
     this.phoneNumber,
+    this.fullPhoneNumber,
     this.profileUrl,
     this.userName,
     this.userUid,
@@ -37,6 +39,7 @@ class Users {
     createdAt = map['createdAt'];
     emailId = map['emailId'];
     phoneNumber = map['phoneNumber'];
+    fullPhoneNumber = map['fullPhoneNumber'];
     profileUrl = map['profileUrl'];
     userName = map['userName'];
     userUid = map['userUid'];
@@ -56,6 +59,7 @@ class Users {
       'createdAt': createdAt,
       'emailId': emailId,
       'phoneNumber': phoneNumber,
+      'fullPhoneNumber': fullPhoneNumber,
       'profileUrl': profileUrl,
       'userName': userName,
       'userUid': userUid,

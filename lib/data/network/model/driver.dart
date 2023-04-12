@@ -5,6 +5,7 @@ class Driver {
   late String panImage;
   late String profileUrl;
   late String phoneNumber;
+  late String fullPhoneNumber;
   late String emailId;
   late String driverName;
   late String driverUid;
@@ -30,6 +31,7 @@ class Driver {
     this.panImage,
     this.profileUrl,
     this.phoneNumber,
+    this.fullPhoneNumber,
     this.emailId,
     this.driverName,
     this.driverUid,
@@ -56,6 +58,7 @@ class Driver {
     panImage = map['panImage'];
     profileUrl = map['profileUrl'];
     phoneNumber = map['phoneNumber'];
+    fullPhoneNumber = map['fullPhoneNumber'];
     emailId = map['emailId'];
     driverName = map['driverName'];
     driverUid = map['driverUid'];
@@ -83,6 +86,7 @@ class Driver {
       'panImage': panImage,
       'profileUrl': profileUrl,
       'phoneNumber': phoneNumber,
+      'fullPhoneNumber': fullPhoneNumber,
       'emailId': emailId,
       'driverName': driverName,
       'driverUid': driverUid,

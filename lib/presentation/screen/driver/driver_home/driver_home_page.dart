@@ -2,6 +2,7 @@ import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'driver_home_view_model.dart';
@@ -37,6 +38,20 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 Expanded(
                   child: Stack(
                     children: [
+                      GoogleMap(
+                        zoomControlsEnabled: false,
+                        initialCameraPosition: CameraPosition(
+                          target: viewModel.driverLocation,
+                          zoom: 16,
+                        ),
+                        onMapCreated: (GoogleMapController controller) {
+                          viewModel.controller.complete(controller);
+                        },
+                        markers: {
+                          if (viewModel.sourcePosition != null)
+                            viewModel.sourcePosition!
+                        },
+                      ),
                       Positioned(
                         top: 40,
                         right: 20,
@@ -62,7 +77,116 @@ class _DriverHomePageState extends State<DriverHomePage> {
                           ],
                         ),
                       ),
+                      if (viewModel.driverOffline) ...[
+                        Positioned(
+                          bottom: 20,
+                          left: MediaQuery.of(context).size.width / 2 - 40,
+                          right: MediaQuery.of(context).size.width / 2 - 40,
+                          child: GestureDetector(
+                            onTap: viewModel.onClickGoButton,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Container(
+                                width: 72,
+                                height: 72,
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple,
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'GO',
+                                  style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        Positioned(
+                          bottom: 20,
+                          left: MediaQuery.of(context).size.width / 2 - 80,
+                          right: MediaQuery.of(context).size.width / 2 - 80,
+                          child: GestureDetector(
+                            onTap: viewModel.onClickSetOfflineButton,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Set Offline',
+                                  style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: GestureDetector(
+                    onTap: !viewModel.driverOffline
+                        ? viewModel.onClickNextButton
+                        : null,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          viewModel.driverOffline
+                              ? 'You\'re offline'
+                              : 'You\'re online',
+                          style: GoogleFonts.openSans(
+                            textStyle: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (!viewModel.driverOffline) ...[
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          const Icon(
+                            Icons.navigate_next_rounded,
+                            size: 24,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ],

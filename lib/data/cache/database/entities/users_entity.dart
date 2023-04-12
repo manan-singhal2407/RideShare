@@ -6,6 +6,7 @@ class UsersEntity {
   late int createdAt;
   late String emailId;
   late String phoneNumber;
+  late String fullPhoneNumber;
   late String profileUrl;
   late String userName;
   late String userUid;
@@ -23,6 +24,7 @@ class UsersEntity {
     this.createdAt,
     this.emailId,
     this.phoneNumber,
+    this.fullPhoneNumber,
     this.profileUrl,
     this.userName,
     this.userUid,

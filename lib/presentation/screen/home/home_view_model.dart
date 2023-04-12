@@ -1,10 +1,5 @@
 import 'dart:async';
 
-import 'package:btp/data/cache/database/dao/driver_dao.dart';
-import 'package:btp/data/cache/database/entities/users_entity.dart';
-import 'package:btp/data/network/model/driver.dart';
-import 'package:btp/data/network/model/users.dart';
-import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder2/geocoder2.dart';
@@ -12,9 +7,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
 
+import '../../../data/cache/database/dao/driver_dao.dart';
 import '../../../data/cache/database/dao/users_dao.dart';
+import '../../../data/cache/database/entities/users_entity.dart';
+import '../../../data/network/model/driver.dart';
 import '../../../domain/extension/model_extension.dart';
 import '../../base/injectable.dart';
+import '../../extension/utils_extension.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UsersDao _usersDao = getIt<UsersDao>();
@@ -96,6 +95,7 @@ class HomeViewModel extends ChangeNotifier {
           '',
           '',
           usersEntity.phoneNumber,
+          usersEntity.fullPhoneNumber,
           usersEntity.emailId,
           usersEntity.userName,
           usersEntity.userUid,

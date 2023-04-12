@@ -87,9 +87,9 @@ class _$LocalDatabase extends LocalDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, PRIMARY KEY (`createdAt`))');
+            'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, PRIMARY KEY (`createdAt`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
+            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -120,6 +120,7 @@ class _$UsersDao extends UsersDao {
                   'createdAt': item.createdAt,
                   'emailId': item.emailId,
                   'phoneNumber': item.phoneNumber,
+                  'fullPhoneNumber': item.fullPhoneNumber,
                   'profileUrl': item.profileUrl,
                   'userName': item.userName,
                   'userUid': item.userUid,
@@ -149,6 +150,7 @@ class _$UsersDao extends UsersDao {
             row['createdAt'] as int,
             row['emailId'] as String,
             row['phoneNumber'] as String,
+            row['fullPhoneNumber'] as String,
             row['profileUrl'] as String,
             row['userName'] as String,
             row['userUid'] as String,
@@ -190,6 +192,7 @@ class _$DriverDao extends DriverDao {
                   'panImage': item.panImage,
                   'profileUrl': item.profileUrl,
                   'phoneNumber': item.phoneNumber,
+                  'fullPhoneNumber': item.fullPhoneNumber,
                   'emailId': item.emailId,
                   'driverName': item.driverName,
                   'driverUid': item.driverUid,
@@ -227,6 +230,7 @@ class _$DriverDao extends DriverDao {
             row['panImage'] as String,
             row['profileUrl'] as String,
             row['phoneNumber'] as String,
+            row['fullPhoneNumber'] as String,
             row['emailId'] as String,
             row['driverName'] as String,
             row['driverUid'] as String,

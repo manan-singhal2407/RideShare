@@ -29,8 +29,10 @@ class BookingRepository implements IBookingRepository {
               .doc('GJwrqF05CsUOcoUCeceoFpQFM6o2')
               .collection('Request')
               .doc(documentReference.id)
-              .set({'request': true})
-              .then((value) {
+              .set({
+            'request': documentReference.id,
+            'time': DateTime.now().millisecondsSinceEpoch
+          }).then((value) {
             onSuccess = true;
           });
         });

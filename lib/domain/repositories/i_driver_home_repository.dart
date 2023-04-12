@@ -9,5 +9,9 @@ abstract class IDriverHomeRepository {
 
   Future<DataState> updateDriverLocation(LatLng latLng);
 
+  Future<DataState> setDriverOnline(bool isDrivingOn);
+
   Future<DataState> logoutUserFromDevice();
+
+  Future<DataState> loadDriverRequestedRides();
 }

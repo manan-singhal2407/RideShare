@@ -180,6 +180,7 @@ class BookingViewModel extends ChangeNotifier {
       0,
       int.parse(_toleranceTimeController.text),
       0,
+      false,
       null,
       null,
       null,

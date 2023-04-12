@@ -30,6 +30,7 @@ class Rides {
   late num toleranceByUser2;
   late num amountNeedToSaveForUser1;
   late num amountNeedToSaveForUser2;
+  late bool cancelledByUser;
   late Users? user1;
   late Users? user2;
   late Driver? driver;
@@ -63,6 +64,7 @@ class Rides {
     this.toleranceByUser2,
     this.amountNeedToSaveForUser1,
     this.amountNeedToSaveForUser2,
+    this.cancelledByUser,
     this.user1,
     this.user2,
     this.driver,
@@ -97,9 +99,14 @@ class Rides {
     toleranceByUser2 = map['toleranceByUser2'];
     amountNeedToSaveForUser1 = map['amountNeedToSaveForUser1'];
     amountNeedToSaveForUser2 = map['amountNeedToSaveForUser2'];
+    cancelledByUser = map['cancelledByUser'];
     user1 = Users.fromJson(map['User1'] as Map<String, dynamic>);
-    user2 = Users.fromJson(map['User2'] as Map<String, dynamic>);
-    driver = Driver.fromJson(map['Driver'] as Map<String, dynamic>);
+    user2 = map['User2'] != null
+        ? Users.fromJson(map['User2'] as Map<String, dynamic>)
+        : null;
+    driver = map['Driver'] != null
+        ? Driver.fromJson(map['Driver'] as Map<String, dynamic>)
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -132,6 +139,7 @@ class Rides {
       'toleranceByUser2': toleranceByUser2,
       'amountNeedToSaveForUser1': amountNeedToSaveForUser1,
       'amountNeedToSaveForUser2': amountNeedToSaveForUser2,
+      'cancelledByUser': cancelledByUser,
       'User1': user1?.toJson(),
       'User2': user2?.toJson(),
       'Driver': driver?.toJson(),

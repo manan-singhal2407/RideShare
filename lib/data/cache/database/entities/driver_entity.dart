@@ -9,6 +9,7 @@ class DriverEntity {
   late String panImage;
   late String profileUrl;
   late String phoneNumber;
+  late String fullPhoneNumber;
   late String emailId;
   late String driverName;
   late String driverUid;
@@ -34,6 +35,7 @@ class DriverEntity {
     this.panImage,
     this.profileUrl,
     this.phoneNumber,
+    this.fullPhoneNumber,
     this.emailId,
     this.driverName,
     this.driverUid,

@@ -1,3 +1,4 @@
+import 'package:btp/data/network/model/rides.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -74,6 +75,29 @@ class DriverHomeRepository implements IDriverHomeRepository {
   }
 
   @override
+  Future<DataState> setDriverOnline(bool isDrivingOn) async {
+    bool onSuccess = false;
+    await _firebaseFirestore
+        .collection('Driver')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .update({'isDrivingOn': isDrivingOn}).then((value) async {
+      await _driverDao.getDriverEntityInfo().then((value) async {
+        if (value.isNotEmpty) {
+          DriverEntity driverEntity = value[0];
+          driverEntity.isDrivingOn = true;
+          await _driverDao.insertDriverEntity(driverEntity);
+          onSuccess = true;
+        }
+      });
+    });
+    if (onSuccess) {
+      return DataState.success(true);
+    } else {
+      return DataState.error(null, null);
+    }
+  }
+
+  @override
   Future<DataState> logoutUserFromDevice() async {
     bool onSuccess = false;
     await _usersDao.clearAllUsersEntity();
@@ -83,6 +107,35 @@ class DriverHomeRepository implements IDriverHomeRepository {
     });
     if (onSuccess) {
       return DataState.success(true);
+    } else {
+      return DataState.error(null, null);
+    }
+  }
+
+  @override
+  Future<DataState> loadDriverRequestedRides() async {
+    bool onSuccess = false;
+    List<Rides> ridesList = [];
+    await _firebaseFirestore
+        .collection('Driver')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('Request')
+        .get()
+        .then((value) async {
+      for (int i = 0; i < value.docs.length; i++) {
+        String rideId = (value.docs)[i]['request'];
+        await _firebaseFirestore
+            .collection('Rides')
+            .doc(rideId)
+            .get()
+            .then((value) async {
+          ridesList.add(Rides.fromJson(value.data()!));
+        });
+      }
+      onSuccess = true;
+    });
+    if (onSuccess) {
+      return DataState.success(ridesList);
     } else {
       return DataState.error(null, null);
     }
