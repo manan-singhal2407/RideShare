@@ -210,7 +210,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                               height: 50,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
-                                color: Colors.green,
+                                color: Colors.purple,
                               ),
                               child: viewModel.driverProfileUrl == ''
                                   ? const Icon(

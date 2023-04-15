@@ -26,7 +26,7 @@ void showScaffoldMessenger(
   );
 }
 
-String getCurrencyFormattedNumber(int value) {
+String getCurrencyFormattedNumber(double value) {
   return NumberFormat.currency(
     symbol: '\u{20B9}',
     locale: 'HI',
@@ -34,7 +34,7 @@ String getCurrencyFormattedNumber(int value) {
   ).format(value);
 }
 
-String getNonCurrencyFormattedNumber(int value) {
+String getNonCurrencyFormattedNumber(double value) {
   return NumberFormat.currency(
     symbol: '',
     locale: 'HI',

@@ -94,7 +94,7 @@ class _BookingPageState extends State<BookingPage> {
                                     child: Container(
                                       padding: const EdgeInsets.all(8),
                                       child: Text(
-                                        '${getNonCurrencyFormattedNumber(viewModel.distanceBetweenSourceAndDestination)}m',
+                                        '${getNonCurrencyFormattedNumber(viewModel.distanceBetweenSourceAndDestination.toDouble())}m',
                                         style: GoogleFonts.openSans(
                                           textStyle: const TextStyle(
                                             color: primaryTextColor,
@@ -183,9 +183,10 @@ class _BookingPageState extends State<BookingPage> {
                               Text(
                                 viewModel.distanceBetweenSourceAndDestination !=
                                         -100
-                                    ? getCurrencyFormattedNumber(viewModel
-                                            .distanceBetweenSourceAndDestination ~/
-                                        50)
+                                    ? getCurrencyFormattedNumber((viewModel
+                                                .distanceBetweenSourceAndDestination ~/
+                                            50)
+                                        .toDouble())
                                     : '-',
                                 style: GoogleFonts.openSans(
                                   textStyle: const TextStyle(

@@ -11,7 +11,7 @@ import '../../../../domain/repositories/i_driver_home_repository.dart';
 import '../../../base/injectable.dart';
 import '../../../theme/widgets/loading.dart';
 
-// todo onDestroy set isDrivingOn to false
+// todo onDestroy set isDrivingOn to false if currentRideId is empty
 
 class DriverHomeViewModel extends ChangeNotifier {
   final IDriverHomeRepository _driverHomeRepository =
@@ -62,7 +62,7 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverProfileUrl = driverEntity.profileUrl;
         _driverName = driverEntity.driverName;
         _driverPhoneNumber = driverEntity.fullPhoneNumber;
-        _driverOffline = driverEntity.currentRideId.isEmpty;
+        _driverOffline = !driverEntity.isDrivingOn;
         notifyListeners();
       }
     });
@@ -75,7 +75,7 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverProfileUrl = driver.profileUrl;
         _driverName = driver.driverName;
         _driverPhoneNumber = driver.fullPhoneNumber;
-        _driverOffline = driver.currentRideId.isEmpty;
+        _driverOffline = !driver.isDrivingOn;
         notifyListeners();
 
         if (driver.currentRideId.isNotEmpty) {
@@ -118,7 +118,7 @@ class DriverHomeViewModel extends ChangeNotifier {
   void onClickNextButton() async {
     Navigator.pushNamed(
       _context,
-      '/mm',
+      '/driver_ride_request_screen',
     );
   }
 

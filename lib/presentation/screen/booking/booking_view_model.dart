@@ -100,7 +100,7 @@ class BookingViewModel extends ChangeNotifier {
       points: polylineCoordinates,
       width: 4,
     );
-    polylines[id] = polyline;
+    _polylines[id] = polyline;
     notifyListeners();
   }
 

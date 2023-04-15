@@ -2,6 +2,9 @@ import 'package:btp/presentation/base/injectable.dart';
 import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/booking/booking_page.dart';
 import 'package:btp/presentation/screen/driver/driver_home/driver_home_page.dart';
+import 'package:btp/presentation/screen/driver/driver_ride_request/driver_ride_request_page.dart';
+import 'package:btp/presentation/screen/driver/driver_ride_request_detail/arguments/driver_ride_request_detail_screen_arguments.dart';
+import 'package:btp/presentation/screen/driver/driver_ride_request_detail/driver_ride_request_detail_page.dart';
 import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_page.dart';
 import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
@@ -48,6 +51,8 @@ class MyApp extends StatelessWidget {
         '/rider/home_screen': (context) => const HomePage(),
         '/driver_home_screen': (context) => const DriverHomePage(),
         '/driver_settings_screen': (context) => const DriverSettingsPage(),
+        '/driver_ride_request_screen': (context) => const DriverRideRequestPage(),
+        '/driver_my_rides_screen': (context) => const DriverSettingsPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/rider/search_screen') {
@@ -67,6 +72,19 @@ class MyApp extends StatelessWidget {
               return BookingPage(
                 pickupLatLng: arguments.pickupLatLng,
                 destinationLatLng: arguments.destinationLatLng,
+              );
+            },
+          );
+        } else if (settings.name == '/driver_ride_request_detail_screen') {
+          final arguments = settings.arguments as DriverRideRequestDetailScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return DriverRideRequestDetailPage(
+                address: arguments.address,
+                distance: arguments.distance,
+                timeTaken: arguments.timeTaken,
+                latLng: arguments.latLng,
+                rides: arguments.rides,
               );
             },
           );

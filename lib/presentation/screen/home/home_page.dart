@@ -248,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                               height: 50,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
-                                color: Colors.green,
+                                color: Colors.purple,
                               ),
                               child: const Icon(
                                 Icons.person_rounded,
