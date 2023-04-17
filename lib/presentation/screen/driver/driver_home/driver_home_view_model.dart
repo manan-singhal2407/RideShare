@@ -10,6 +10,7 @@ import '../../../../data/network/model/driver.dart';
 import '../../../../domain/repositories/i_driver_home_repository.dart';
 import '../../../base/injectable.dart';
 import '../../../theme/widgets/loading.dart';
+import '../driver_rides/arguments/driver_rides_screen_arguments.dart';
 
 // todo onDestroy set isDrivingOn to false if currentRideId is empty
 
@@ -30,11 +31,13 @@ class DriverHomeViewModel extends ChangeNotifier {
   String _driverPhoneNumber = '';
   bool _driverOffline = true;
 
+  late Timer _timer;
+
   DriverHomeViewModel(this._context) {
     _getDataFromLocalDatabase();
     _getDataFromDatabase();
     _getCurrentLocation();
-    Timer.periodic(const Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _getCurrentLocation();
     });
   }
@@ -79,7 +82,14 @@ class DriverHomeViewModel extends ChangeNotifier {
         notifyListeners();
 
         if (driver.currentRideId.isNotEmpty) {
-          // todo send user to next screen with ride id
+          Navigator.pushNamed(
+            _context,
+            '/driver_rides_screen',
+            arguments: DriverRidesScreenArguments(
+              driver.currentRideId,
+              null,
+            ),
+          );
         }
       }
     });
@@ -140,5 +150,9 @@ class DriverHomeViewModel extends ChangeNotifier {
         (r) => false,
       );
     });
+  }
+
+  void disposeScreen() async {
+    _timer.cancel();
   }
 }

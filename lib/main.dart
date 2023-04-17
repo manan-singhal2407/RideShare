@@ -5,6 +5,8 @@ import 'package:btp/presentation/screen/driver/driver_home/driver_home_page.dart
 import 'package:btp/presentation/screen/driver/driver_ride_request/driver_ride_request_page.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/arguments/driver_ride_request_detail_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/driver_ride_request_detail_page.dart';
+import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
+import 'package:btp/presentation/screen/driver/driver_rides/driver_rides_page.dart';
 import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_page.dart';
 import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
@@ -84,6 +86,16 @@ class MyApp extends StatelessWidget {
                 distance: arguments.distance,
                 timeTaken: arguments.timeTaken,
                 latLng: arguments.latLng,
+                rides: arguments.rides,
+              );
+            },
+          );
+        } else if (settings.name == '/driver_rides_screen') {
+          final arguments = settings.arguments as DriverRidesScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return DriverRidesPage(
+                currentRideId: arguments.currentRideId,
                 rides: arguments.rides,
               );
             },

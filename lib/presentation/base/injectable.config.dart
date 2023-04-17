@@ -5,9 +5,9 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:btp/data/cache/database/dao/driver_dao.dart' as _i20;
-import 'package:btp/data/cache/database/dao/users_dao.dart' as _i19;
-import 'package:btp/data/cache/database/local_database.dart' as _i18;
+import 'package:btp/data/cache/database/dao/driver_dao.dart' as _i22;
+import 'package:btp/data/cache/database/dao/users_dao.dart' as _i21;
+import 'package:btp/data/cache/database/local_database.dart' as _i20;
 import 'package:btp/data/network/service/firebase_service.dart' as _i5;
 import 'package:btp/data/repositories/booking_repository.dart' as _i7;
 import 'package:btp/data/repositories/driver_home_repository.dart' as _i9;
@@ -15,20 +15,22 @@ import 'package:btp/data/repositories/driver_ride_request_detail_repository.dart
     as _i11;
 import 'package:btp/data/repositories/driver_ride_request_repository.dart'
     as _i13;
-import 'package:btp/data/repositories/driver_settings_repository.dart' as _i15;
-import 'package:btp/data/repositories/splash_repository.dart' as _i17;
-import 'package:btp/domain/di/app_module.dart' as _i21;
-import 'package:btp/domain/di/cache_module.dart' as _i22;
-import 'package:btp/domain/di/network_module.dart' as _i23;
+import 'package:btp/data/repositories/driver_rides_repository.dart' as _i15;
+import 'package:btp/data/repositories/driver_settings_repository.dart' as _i17;
+import 'package:btp/data/repositories/splash_repository.dart' as _i19;
+import 'package:btp/domain/di/app_module.dart' as _i23;
+import 'package:btp/domain/di/cache_module.dart' as _i24;
+import 'package:btp/domain/di/network_module.dart' as _i25;
 import 'package:btp/domain/repositories/i_booking_repository.dart' as _i6;
 import 'package:btp/domain/repositories/i_driver_home_repository.dart' as _i8;
 import 'package:btp/domain/repositories/i_driver_ride_request_detail_repository.dart'
     as _i10;
 import 'package:btp/domain/repositories/i_driver_ride_request_repository.dart'
     as _i12;
+import 'package:btp/domain/repositories/i_driver_rides_repository.dart' as _i14;
 import 'package:btp/domain/repositories/i_driver_settings_repository.dart'
-    as _i14;
-import 'package:btp/domain/repositories/i_splash_repository.dart' as _i16;
+    as _i16;
+import 'package:btp/domain/repositories/i_splash_repository.dart' as _i18;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i4;
 import 'package:firebase_auth/firebase_auth.dart' as _i3;
 import 'package:get_it/get_it.dart' as _i1;
@@ -62,23 +64,24 @@ extension GetItInjectableX on _i1.GetIt {
         () => _i11.DriverRideRequestDetailRepository());
     gh.factory<_i12.IDriverRideRequestRepository>(
         () => _i13.DriverRideRequestRepository());
-    gh.factory<_i14.IDriverSettingsRepository>(
-        () => _i15.DriverSettingsRepository());
-    gh.factory<_i16.ISplashRepository>(() => _i17.SplashRepository());
-    await gh.factoryAsync<_i18.LocalDatabase>(
+    gh.factory<_i14.IDriverRidesRepository>(() => _i15.DriverRidesRepository());
+    gh.factory<_i16.IDriverSettingsRepository>(
+        () => _i17.DriverSettingsRepository());
+    gh.factory<_i18.ISplashRepository>(() => _i19.SplashRepository());
+    await gh.factoryAsync<_i20.LocalDatabase>(
       () => cacheModule.localDatabase,
       preResolve: true,
     );
-    gh.factory<_i19.UsersDao>(
-        () => cacheModule.usersDao(gh<_i18.LocalDatabase>()));
-    gh.factory<_i20.DriverDao>(
-        () => cacheModule.adsRulesDao(gh<_i18.LocalDatabase>()));
+    gh.factory<_i21.UsersDao>(
+        () => cacheModule.usersDao(gh<_i20.LocalDatabase>()));
+    gh.factory<_i22.DriverDao>(
+        () => cacheModule.adsRulesDao(gh<_i20.LocalDatabase>()));
     return this;
   }
 }
 
-class _$AppModule extends _i21.AppModule {}
+class _$AppModule extends _i23.AppModule {}
 
-class _$CacheModule extends _i22.CacheModule {}
+class _$CacheModule extends _i24.CacheModule {}
 
-class _$NetworkModule extends _i23.NetworkModule {}
+class _$NetworkModule extends _i25.NetworkModule {}

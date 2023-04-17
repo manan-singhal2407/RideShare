@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
 import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -105,19 +106,36 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
   }
 
   void onAcceptRequest() async {
-    notifyListeners();
+    showLoadingDialogBox(_context);
+    await _driverRideRequestDetailRepository
+        .acceptRideRequest(_rides.rideId)
+        .then((value) {
+      Navigator.pop(_context);
+      if (value.data != null) {
+        Navigator.pushNamedAndRemoveUntil(
+          _context,
+          '/driver_rides_screen',
+          ModalRoute.withName('/driver_home_screen'),
+          arguments: DriverRidesScreenArguments(
+            '',
+            value.data as Rides,
+          ),
+        );
+      }
+    }).onError((error, stackTrace) {
+      Navigator.pop(_context);
+    });
   }
 
   void onRejectRequest() async {
-    // todo rideId
     showLoadingDialogBox(_context);
     await _driverRideRequestDetailRepository
-        .removeRejectedRideRequest('')
+        .removeRejectedRideRequest(_rides.rideId)
         .then((value) {
+      Navigator.pop(_context);
       if (value.data != null) {
         Navigator.pop(_context);
       }
-      Navigator.pop(_context);
     }).onError((error, stackTrace) {
       Navigator.pop(_context);
     });

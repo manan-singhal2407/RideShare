@@ -2,6 +2,7 @@ import 'driver.dart';
 import 'users.dart';
 
 class Rides {
+  late String rideId;
   late num createdRide1At;
   late num createdRide2At;
   late num approvedRide1At;
@@ -36,6 +37,7 @@ class Rides {
   late Driver? driver;
 
   Rides(
+    this.rideId,
     this.createdRide1At,
     this.createdRide2At,
     this.approvedRide1At,
@@ -71,6 +73,7 @@ class Rides {
   );
 
   Rides.fromJson(Map<String, dynamic> map) {
+    rideId = map['rideId'];
     createdRide1At = map['createdRide1At'];
     createdRide2At = map['createdRide2At'];
     approvedRide1At = map['approvedRide1At'];
@@ -111,6 +114,7 @@ class Rides {
 
   Map<String, dynamic> toJson() {
     return {
+      'rideId': rideId,
       'createdRide1At': createdRide1At,
       'createdRide2At': createdRide2At,
       'approvedRide1At': approvedRide1At,

@@ -152,6 +152,7 @@ class BookingViewModel extends ChangeNotifier {
 
   void onBookSwiftClicked() async {
     Rides rides = Rides(
+      '',
       DateTime.now().millisecondsSinceEpoch,
       0,
       0,
@@ -176,7 +177,7 @@ class BookingViewModel extends ChangeNotifier {
       _isCarPoolingEnabled,
       false,
       false,
-      int.parse(_toleranceTimeController.text)*60,
+      int.parse(_toleranceTimeController.text) * 60,
       0,
       int.parse(_toleranceTimeController.text),
       0,
@@ -188,10 +189,7 @@ class BookingViewModel extends ChangeNotifier {
     // todo add request to driver and user table as well
     await _bookingRepository.requestedNewRideToDatabase(rides).then((value) {
       if (value.data != null) {
-
-      } else {
-
-      }
+      } else {}
       notifyListeners();
     });
   }

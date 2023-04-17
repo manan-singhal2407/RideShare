@@ -23,17 +23,20 @@ class BookingRepository implements IBookingRepository {
         await _firebaseFirestore
             .collection('Rides')
             .add(rides.toJson())
-            .then((documentReference) async {
+            .then((ridesReference) async {
           await _firebaseFirestore
-              .collection('Driver')
-              .doc('GJwrqF05CsUOcoUCeceoFpQFM6o2')
-              .collection('Request')
-              .doc(documentReference.id)
-              .set({
-            'request': documentReference.id,
-            'time': DateTime.now().millisecondsSinceEpoch
-          }).then((value) {
-            onSuccess = true;
+              .collection('Rides')
+              .doc(ridesReference.id)
+              .update({'rideId': ridesReference.id})
+              .then((documentReference) async {
+                await _firebaseFirestore
+                .collection('Driver')
+                .doc('GJwrqF05CsUOcoUCeceoFpQFM6o2')
+                .collection('Request')
+                .doc(ridesReference.id)
+                .set({'request': ridesReference.id}).then((value) {
+                  onSuccess = true;
+            });
           });
         });
       }

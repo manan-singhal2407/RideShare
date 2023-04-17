@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import 'driver_home_view_model.dart';
 
+// todo on ride going if user click online it goes to ride request page but he should go to rides_screen
+
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({super.key});
 
@@ -16,10 +18,6 @@ class DriverHomePage extends StatefulWidget {
 
 class _DriverHomePageState extends State<DriverHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void _openDrawer() {
-    _scaffoldKey.currentState?.openDrawer();
-  }
 
   void _closeDrawer() {
     _scaffoldKey.currentState?.closeDrawer();
@@ -33,163 +31,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
         builder: (context, viewModel, child) {
           return Scaffold(
             key: _scaffoldKey,
-            body: Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      GoogleMap(
-                        zoomControlsEnabled: false,
-                        initialCameraPosition: CameraPosition(
-                          target: viewModel.driverLocation,
-                          zoom: 16,
-                        ),
-                        onMapCreated: (GoogleMapController controller) {
-                          viewModel.controller.complete(controller);
-                        },
-                        markers: {
-                          if (viewModel.sourcePosition != null)
-                            viewModel.sourcePosition!
-                        },
-                      ),
-                      Positioned(
-                        top: 40,
-                        right: 20,
-                        left: 20,
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: _openDrawer,
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                child: const SizedBox(
-                                  width: 50,
-                                  height: 50,
-                                  child: Icon(
-                                    Icons.menu,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (viewModel.driverOffline) ...[
-                        Positioned(
-                          bottom: 20,
-                          left: MediaQuery.of(context).size.width / 2 - 40,
-                          right: MediaQuery.of(context).size.width / 2 - 40,
-                          child: GestureDetector(
-                            onTap: viewModel.onClickGoButton,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              child: Container(
-                                width: 72,
-                                height: 72,
-                                decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'GO',
-                                  style: GoogleFonts.openSans(
-                                    textStyle: const TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ] else ...[
-                        Positioned(
-                          bottom: 20,
-                          left: MediaQuery.of(context).size.width / 2 - 80,
-                          right: MediaQuery.of(context).size.width / 2 - 80,
-                          child: GestureDetector(
-                            onTap: viewModel.onClickSetOfflineButton,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Set Offline',
-                                  style: GoogleFonts.openSans(
-                                    textStyle: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  child: GestureDetector(
-                    onTap: !viewModel.driverOffline
-                        ? viewModel.onClickNextButton
-                        : null,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          viewModel.driverOffline
-                              ? 'You\'re offline'
-                              : 'You\'re online',
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (!viewModel.driverOffline) ...[
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          const Icon(
-                            Icons.navigate_next_rounded,
-                            size: 24,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            body: _DriverHomePageBodyLayout(
+              scaffoldKey: _scaffoldKey,
+              viewModel: viewModel,
             ),
             drawer: Drawer(
               child: Column(
@@ -271,7 +115,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
                           onTap: () {
                             _closeDrawer();
                             showScaffoldMessenger(
-                                context, 'My Rides', primaryTextColor);
+                              context,
+                              'My Rides',
+                              primaryTextColor,
+                            );
                           },
                           leading: Container(
                             width: 40,
@@ -405,6 +252,194 @@ class _DriverHomePageState extends State<DriverHomePage> {
           );
         },
       ),
+    );
+  }
+}
+
+class _DriverHomePageBodyLayout extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  final DriverHomeViewModel viewModel;
+
+  const _DriverHomePageBodyLayout({
+    required this.scaffoldKey,
+    required this.viewModel,
+  });
+
+  @override
+  State<_DriverHomePageBodyLayout> createState() =>
+      _DriverHomePageBodyLayoutState();
+}
+
+class _DriverHomePageBodyLayoutState extends State<_DriverHomePageBodyLayout> {
+  @override
+  void dispose() {
+    widget.viewModel.disposeScreen();
+    super.dispose();
+  }
+
+  void _openDrawer() {
+    widget.scaffoldKey.currentState?.openDrawer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              GoogleMap(
+                zoomControlsEnabled: false,
+                initialCameraPosition: CameraPosition(
+                  target: widget.viewModel.driverLocation,
+                  zoom: 16,
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  widget.viewModel.controller.complete(controller);
+                },
+                markers: {
+                  if (widget.viewModel.sourcePosition != null)
+                    widget.viewModel.sourcePosition!
+                },
+              ),
+              Positioned(
+                top: 40,
+                right: 20,
+                left: 20,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: _openDrawer,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Icon(
+                            Icons.menu,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (widget.viewModel.driverOffline) ...[
+                Positioned(
+                  bottom: 20,
+                  left: MediaQuery.of(context).size.width / 2 - 40,
+                  right: MediaQuery.of(context).size.width / 2 - 40,
+                  child: GestureDetector(
+                    onTap: widget.viewModel.onClickGoButton,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'GO',
+                          style: GoogleFonts.openSans(
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ] else ...[
+                Positioned(
+                  bottom: 20,
+                  left: MediaQuery.of(context).size.width / 2 - 80,
+                  right: MediaQuery.of(context).size.width / 2 - 80,
+                  child: GestureDetector(
+                    onTap: widget.viewModel.onClickSetOfflineButton,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Set Offline',
+                          style: GoogleFonts.openSans(
+                            textStyle: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: GestureDetector(
+            onTap: !widget.viewModel.driverOffline
+                ? widget.viewModel.onClickNextButton
+                : null,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.viewModel.driverOffline
+                      ? 'You\'re offline'
+                      : 'You\'re online',
+                  style: GoogleFonts.openSans(
+                    textStyle: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (!widget.viewModel.driverOffline) ...[
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  const Icon(
+                    Icons.navigate_next_rounded,
+                    size: 24,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
