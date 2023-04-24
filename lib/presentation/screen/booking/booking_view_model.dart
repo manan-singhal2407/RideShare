@@ -73,6 +73,7 @@ class BookingViewModel extends ChangeNotifier {
           response.routes[0].legs[0].distance.value.toInt();
       _timeTakenBetweenSourceAndDestination =
           response.routes[0].legs[0].duration.text;
+
       notifyListeners();
     }
   }
@@ -151,46 +152,46 @@ class BookingViewModel extends ChangeNotifier {
   }
 
   void onBookSwiftClicked() async {
-    Rides rides = Rides(
-      '',
-      DateTime.now().millisecondsSinceEpoch,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      _distanceBetweenSourceAndDestination / 50,
-      0,
-      _distanceBetweenSourceAndDestination / 60,
-      0,
-      0,
-      _pickupLatLng.latitude,
-      _pickupLatLng.longitude,
-      _destinationLatLng.latitude,
-      _destinationLatLng.longitude,
-      0,
-      0,
-      0,
-      0,
-      _isCarPoolingEnabled,
-      false,
-      false,
-      int.parse(_toleranceTimeController.text) * 60,
-      0,
-      int.parse(_toleranceTimeController.text),
-      0,
-      false,
-      null,
-      null,
-      null,
-    );
-    // todo add request to driver and user table as well
-    await _bookingRepository.requestedNewRideToDatabase(rides).then((value) {
-      if (value.data != null) {
-      } else {}
-      notifyListeners();
-    });
+    // Rides rides = Rides(
+    //   '',
+    //   DateTime.now().millisecondsSinceEpoch,
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    //   _distanceBetweenSourceAndDestination / 50,
+    //   0,
+    //   _distanceBetweenSourceAndDestination / 60,
+    //   0,
+    //   0,
+    //   _pickupLatLng.latitude,
+    //   _pickupLatLng.longitude,
+    //   _destinationLatLng.latitude,
+    //   _destinationLatLng.longitude,
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    //   _isCarPoolingEnabled,
+    //   false,
+    //   false,
+    //   int.parse(_toleranceTimeController.text) * 60,
+    //   0,
+    //   int.parse(_toleranceTimeController.text),
+    //   0,
+    //   false,
+    //   null,
+    //   null,
+    //   null,
+    // );
+    // // todo add request to driver and user table as well
+    // await _bookingRepository.requestedNewRideToDatabase(rides).then((value) {
+    //   if (value.data != null) {
+    //   } else {}
+    //   notifyListeners();
+    // });
   }
 }

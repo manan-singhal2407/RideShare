@@ -21,6 +21,7 @@ UsersEntity convertUsersToUsersEntity(Users users) {
     users.tolerance.toInt(),
     users.amountNeedToSave.toInt(),
     users.isSharingOn,
+    users.currentRideId,
   );
 }
 
@@ -42,6 +43,7 @@ Users convertUsersEntityToUsers(UsersEntity usersEntity) {
     usersEntity.tolerance,
     usersEntity.amountNeedToSave,
     usersEntity.isSharingOn,
+    usersEntity.currentRideId,
   );
 }
 

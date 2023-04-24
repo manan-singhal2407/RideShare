@@ -44,7 +44,7 @@ class SplashViewModel extends ChangeNotifier {
     _splashRepository.checkIfUserIsADriver().then((value) {
       AccountTypeEnum accountTypeEnum = value.data as AccountTypeEnum;
       if (accountTypeEnum == AccountTypeEnum.user) {
-        Navigator.pushReplacementNamed(_context, '/rider/home_screen');
+        Navigator.pushReplacementNamed(_context, '/rider_home_screen');
       } else if (accountTypeEnum == AccountTypeEnum.driver) {
         Navigator.pushReplacementNamed(_context, '/driver_home_screen');
       } else if (accountTypeEnum == AccountTypeEnum.latest) {

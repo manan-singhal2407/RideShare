@@ -36,9 +36,10 @@ class DriverHomeViewModel extends ChangeNotifier {
   DriverHomeViewModel(this._context) {
     _getDataFromLocalDatabase();
     _getDataFromDatabase();
-    _getCurrentLocation();
+    // todo
+    // _getCurrentLocation();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      _getCurrentLocation();
+      // _getCurrentLocation();
     });
   }
 
@@ -66,6 +67,8 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverName = driverEntity.driverName;
         _driverPhoneNumber = driverEntity.fullPhoneNumber;
         _driverOffline = !driverEntity.isDrivingOn;
+        // todo
+        _driverLocation = LatLng(driverEntity.currentLatitude, driverEntity.currentLongitude);
         notifyListeners();
       }
     });
@@ -112,7 +115,8 @@ class DriverHomeViewModel extends ChangeNotifier {
       position: _driverLocation,
     );
     notifyListeners();
-    await _driverHomeRepository.updateDriverLocation(_driverLocation);
+    // todo
+    // await _driverHomeRepository.updateDriverLocation(_driverLocation);
   }
 
   void onClickGoButton() async {

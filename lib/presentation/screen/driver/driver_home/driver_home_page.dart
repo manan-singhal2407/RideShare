@@ -183,8 +183,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         ListTile(
                           onTap: () async {
                             _closeDrawer();
-                            showScaffoldMessenger(
-                                context, 'Support', primaryTextColor);
+                            redirectUserToEmail();
                           },
                           leading: Container(
                             width: 40,

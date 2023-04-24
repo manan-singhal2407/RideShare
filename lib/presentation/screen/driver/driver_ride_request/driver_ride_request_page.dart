@@ -125,7 +125,7 @@ class _DriverRideRequestViewLayoutState
                         width: 12,
                       ),
                       Text(
-                        '${rides[2]} (${rides[1]} m) away',
+                        '${rides[2]} (${rides[1]} km) away',
                         style: GoogleFonts.openSans(
                           textStyle: const TextStyle(
                             color: primaryTextColor,
@@ -179,7 +179,7 @@ class _DriverRideRequestViewLayoutState
                         width: 12,
                       ),
                       Text(
-                        '${rides[5]} (${rides[4]} m) trip',
+                        '${rides[5]} (${rides[4]} km) trip',
                         style: GoogleFonts.openSans(
                           textStyle: const TextStyle(
                             color: primaryTextColor,

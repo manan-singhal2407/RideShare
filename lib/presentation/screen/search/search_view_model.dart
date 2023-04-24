@@ -13,7 +13,8 @@ class SearchViewModel extends ChangeNotifier {
 
   SearchViewModel(this._context) {
     _searchQueryController.addListener(() {
-      if (_searchQueryController.text.isNotEmpty && _searchQueryController.text.length >= 3) {
+      if (_searchQueryController.text.isNotEmpty &&
+          _searchQueryController.text.length >= 3) {
         _searchPlaces(_searchQueryController.text.trim());
       } else {
         notifyListeners();
@@ -29,8 +30,11 @@ class SearchViewModel extends ChangeNotifier {
     final predictions = await _searchedPlaces.autocomplete(
       searchQuery,
       language: 'en',
-      radius: 10000,
+      radius: 60000,
       location: Location(lat: 30.7191, lng: 76.7487),
+      components: [
+        Component(Component.country, 'in'),
+      ],
       strictbounds: true,
     );
     _searchedPredictions = predictions.predictions;

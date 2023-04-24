@@ -1,36 +1,23 @@
-import 'package:btp/presentation/extension/utils_extension.dart';
-import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
-import 'package:btp/presentation/theme/color.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
-import 'home_view_model.dart';
+import '../../../extension/utils_extension.dart';
+import '../../../theme/color.dart';
+import '../../search/arguments/search_screen_arguments.dart';
+import '../rider_settings/arguments/rider_settings_screen_arguments.dart';
+import 'rider_home_view_model.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class RiderHomePage extends StatefulWidget {
+  const RiderHomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<RiderHomePage> createState() => _RiderHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _RiderHomePageState extends State<RiderHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  BitmapDescriptor? markerIcon;
-
-  @override
-  void initState() {
-    super.initState();
-    BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(48, 48)),
-      'assets/images/pick.png',
-    ).then((icon) {
-      markerIcon = icon;
-    });
-  }
 
   void _openDrawer() {
     _scaffoldKey.currentState?.openDrawer();
@@ -42,9 +29,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<HomeViewModel>(
-      create: (context) => HomeViewModel(context),
-      child: Consumer<HomeViewModel>(
+    return ChangeNotifierProvider<RiderHomeViewModel>(
+      create: (context) => RiderHomeViewModel(context),
+      child: Consumer<RiderHomeViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
             key: _scaffoldKey,
@@ -78,14 +65,14 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       if (viewModel.sourcePosition == null) ...[
-                        Align(
+                        const Align(
                           alignment: Alignment.center,
                           child: Padding(
-                            padding: const EdgeInsets.only(bottom: 35.0),
-                            child: Image.asset(
-                              'assets/images/pick.png',
-                              height: 45,
-                              width: 45,
+                            padding: EdgeInsets.only(bottom: 35.0),
+                            child: Icon(
+                              Icons.location_on,
+                              size: 45,
+                              color: Colors.red,
                             ),
                           ),
                         ),
@@ -127,34 +114,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ).then((result) async {
                                     if (result != null) {
-                                      var prediction = result as Prediction;
-                                      GoogleMapsPlaces googleMapsPlaces =
-                                          GoogleMapsPlaces(
-                                        apiKey:
-                                            'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
-                                      );
-                                      PlacesDetailsResponse details =
-                                          await googleMapsPlaces
-                                              .getDetailsByPlaceId(
-                                        prediction.placeId!,
-                                      );
-                                      LatLng latLng = LatLng(
-                                        (details
-                                            .result.geometry?.location.lat)!,
-                                        (details
-                                            .result.geometry?.location.lng)!,
-                                      );
-                                      Marker marker = Marker(
-                                        markerId: MarkerId(prediction.placeId!),
-                                        position: latLng,
-                                        infoWindow: InfoWindow(
-                                          title: prediction.description,
-                                          snippet:
-                                              details.result.formattedAddress,
-                                        ),
-                                      );
-                                      viewModel.addSourcePositionMarker(
-                                          latLng, marker);
+                                      viewModel.onAddressSelect(result);
                                     }
                                   });
                                 },
@@ -250,10 +210,16 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(25),
                                 color: Colors.purple,
                               ),
-                              child: const Icon(
-                                Icons.person_rounded,
-                                size: 32,
-                              ),
+                              child: viewModel.riderProfileUrl == ''
+                                  ? const Icon(
+                                      Icons.person_rounded,
+                                      size: 32,
+                                    )
+                                  : Image.network(
+                                      viewModel.riderProfileUrl,
+                                      width: 32,
+                                      height: 32,
+                                    ),
                             ),
                             const SizedBox(
                               width: 12,
@@ -263,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Manan Singhal',
+                                  viewModel.riderName,
                                   style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(
                                       color: primaryTextColor,
@@ -275,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  '+917340334826',
+                                  viewModel.riderPhoneNumber,
                                   style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(
                                       color: secondaryTextColor,
@@ -303,14 +269,17 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             _closeDrawer();
                             showScaffoldMessenger(
-                                context, 'My Rides', primaryTextColor);
+                              context,
+                              'My Rides',
+                              primaryTextColor,
+                            );
                           },
                           leading: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.grey.shade500,
+                              color: Colors.orange.shade500,
                             ),
                             child: const Icon(
                               Icons.timelapse_rounded,
@@ -332,10 +301,17 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         ListTile(
-                          onTap: () {
+                          onTap: () async {
                             _closeDrawer();
-                            showScaffoldMessenger(
-                                context, 'Settings', primaryTextColor);
+                            Navigator.pushNamed(
+                              context,
+                              '/rider_settings_screen',
+                              arguments: RiderSettingsScreenArguments(
+                                (viewModel.users?.isSharingOn)!,
+                                (viewModel.users?.tolerance)!.toInt(),
+                                (viewModel.users?.amountNeedToSave)!.toInt(),
+                              ),
+                            );
                           },
                           leading: Container(
                             width: 40,
@@ -366,20 +342,14 @@ class _HomePageState extends State<HomePage> {
                         ListTile(
                           onTap: () async {
                             _closeDrawer();
-                            await FirebaseAuth.instance.signOut().then((value) {
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                '/login_screen',
-                                    (r) => false,
-                              );
-                            });
+                            redirectUserToEmail();
                           },
                           leading: Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.orange.shade500,
+                              color: Colors.grey.shade500,
                             ),
                             child: const Icon(
                               Icons.support_rounded,
@@ -389,6 +359,37 @@ class _HomePageState extends State<HomePage> {
                           ),
                           title: Text(
                             'Support',
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: secondaryTextColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () async {
+                            _closeDrawer();
+                            viewModel.logoutUser();
+                          },
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.orange.shade500,
+                            ),
+                            child: const Icon(
+                              Icons.logout_rounded,
+                              size: 24,
+                              color: Colors.white,
+                            ),
+                          ),
+                          title: Text(
+                            'Logout',
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
                                 color: secondaryTextColor,

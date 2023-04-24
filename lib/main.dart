@@ -8,8 +8,12 @@ import 'package:btp/presentation/screen/driver/driver_ride_request_detail/driver
 import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_rides/driver_rides_page.dart';
 import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_page.dart';
-import 'package:btp/presentation/screen/home/home_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
+import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
+import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
+import 'package:btp/presentation/screen/rider/rider_home/rider_home_page.dart';
+import 'package:btp/presentation/screen/rider/rider_settings/arguments/rider_settings_screen_arguments.dart';
+import 'package:btp/presentation/screen/rider/rider_settings/rider_settings_page.dart';
 import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
 import 'package:btp/presentation/screen/search/search_page.dart';
 import 'package:btp/presentation/screen/splash/splash_page.dart';
@@ -50,7 +54,7 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/splash_screen': (context) => const SplashPage(),
         '/login_screen': (context) => const LoginPage(),
-        '/rider/home_screen': (context) => const HomePage(),
+        '/rider_home_screen': (context) => const RiderHomePage(),
         '/driver_home_screen': (context) => const DriverHomePage(),
         '/driver_settings_screen': (context) => const DriverSettingsPage(),
         '/driver_ride_request_screen': (context) => const DriverRideRequestPage(),
@@ -72,6 +76,30 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder: (context) {
               return BookingPage(
+                pickupLatLng: arguments.pickupLatLng,
+                destinationLatLng: arguments.destinationLatLng,
+              );
+            },
+          );
+        } else if (settings.name == '/rider_settings_screen') {
+          final arguments = settings.arguments as RiderSettingsScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return RiderSettingsPage(
+                isSharingOn: arguments.isSharingOn,
+                tolerance: arguments.tolerance,
+                amountNeedToSave: arguments.amountNeedToSave,
+              );
+            },
+          );
+        } else if (settings.name == '/rider_booking_screen') {
+          final arguments = settings.arguments as RiderBookingScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return RiderBookingPage(
+                isSharingOn: arguments.isSharingOn,
+                tolerance: arguments.tolerance,
+                amountNeedToSave: arguments.amountNeedToSave,
                 pickupLatLng: arguments.pickupLatLng,
                 destinationLatLng: arguments.destinationLatLng,
               );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
+import 'package:btp/presentation/theme/color.dart';
 import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -24,8 +25,19 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
   Marker? _sourcePosition, _destinationPosition;
 
   DriverRideRequestDetailViewModel(this._context, this._latLng, this._rides) {
+    _sourcePosition = Marker(
+      markerId: const MarkerId('source'),
+      position: _latLng,
+    );
+    _destinationPosition = Marker(
+      markerId: const MarkerId('destination'),
+      position: LatLng(
+        _rides.pickupUser1Latitude,
+        _rides.pickupUser1Longitude,
+      ),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    );
     _getPolylinesBetweenSourceAndDestination();
-    _getSourceAndDestinationMarker();
   }
 
   Map<PolylineId, Polyline> get polylines => _polylines;
@@ -61,54 +73,10 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _getSourceAndDestinationMarker() async {
-    await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(
-        size: Size(24, 24),
-      ),
-      'assets/images/pick.png',
-    ).then((icon) {
-      _sourcePosition = Marker(
-        markerId: const MarkerId('pickup'),
-        position: _latLng,
-      );
-    }).onError((error, stackTrace) {
-      _sourcePosition = Marker(
-        markerId: const MarkerId('pickup'),
-        position: _latLng,
-      );
-    });
-
-    await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(
-        size: Size(48, 48),
-      ),
-      'assets/images/pick.png',
-    ).then((icon) {
-      _destinationPosition = Marker(
-        markerId: const MarkerId('destination'),
-        position: LatLng(
-          _rides.pickupUser1Latitude,
-          _rides.pickupUser1Longitude,
-        ),
-      );
-    }).onError((error, stackTrace) {
-      _destinationPosition = Marker(
-        markerId: const MarkerId('destination'),
-        position: LatLng(
-          _rides.pickupUser1Latitude,
-          _rides.pickupUser1Longitude,
-        ),
-      );
-    });
-
-    notifyListeners();
-  }
-
   void onAcceptRequest() async {
     showLoadingDialogBox(_context);
     await _driverRideRequestDetailRepository
-        .acceptRideRequest(_rides.rideId)
+        .acceptRideRequest(_rides.rideId, (_rides.user1?.userUid)!)
         .then((value) {
       Navigator.pop(_context);
       if (value.data != null) {
@@ -121,6 +89,13 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
             value.data as Rides,
           ),
         );
+      } else {
+        showScaffoldMessenger(
+          _context,
+          'This ride does not exist any more',
+          errorStateColor,
+        );
+        Navigator.pop(_context);
       }
     }).onError((error, stackTrace) {
       Navigator.pop(_context);
@@ -130,7 +105,7 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
   void onRejectRequest() async {
     showLoadingDialogBox(_context);
     await _driverRideRequestDetailRepository
-        .removeRejectedRideRequest(_rides.rideId)
+        .removeRejectedRideRequest(_rides.rideId, (_rides.user1?.userUid)!)
         .then((value) {
       Navigator.pop(_context);
       if (value.data != null) {

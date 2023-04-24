@@ -87,7 +87,7 @@ class _$LocalDatabase extends LocalDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, PRIMARY KEY (`createdAt`))');
+            'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`createdAt`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
 
@@ -132,7 +132,8 @@ class _$UsersDao extends UsersDao {
                   'totalAmountSaved': item.totalAmountSaved,
                   'tolerance': item.tolerance,
                   'amountNeedToSave': item.amountNeedToSave,
-                  'isSharingOn': item.isSharingOn ? 1 : 0
+                  'isSharingOn': item.isSharingOn ? 1 : 0,
+                  'currentRideId': item.currentRideId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -162,7 +163,8 @@ class _$UsersDao extends UsersDao {
             row['totalAmountSaved'] as int,
             row['tolerance'] as int,
             row['amountNeedToSave'] as int,
-            (row['isSharingOn'] as int) != 0));
+            (row['isSharingOn'] as int) != 0,
+            row['currentRideId'] as String));
   }
 
   @override

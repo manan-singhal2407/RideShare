@@ -1,4 +1,7 @@
+import 'package:btp/presentation/extension/utils_extension.dart';
 import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
+import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
+import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -93,8 +96,7 @@ class _SearchPageState extends State<SearchPage> {
                               if (widget.type == 'destination') {
                                 GoogleMapsPlaces googleMapsPlaces =
                                 GoogleMapsPlaces(
-                                  apiKey:
-                                  'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24',
+                                  apiKey: googleMapsApiKey,
                                 );
                                 PlacesDetailsResponse details =
                                     await googleMapsPlaces
@@ -109,8 +111,11 @@ class _SearchPageState extends State<SearchPage> {
                                 );
                                 Navigator.pushReplacementNamed(
                                   context,
-                                  '/rider/booking_screen',
-                                  arguments: BookingScreenArguments(
+                                  '/rider_booking_screen',
+                                  arguments: RiderBookingScreenArguments(
+                                    true,
+                                    900,
+                                    50,
                                     widget.latLng,
                                     latLng,
                                   ),

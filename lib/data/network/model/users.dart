@@ -15,6 +15,7 @@ class Users {
   late num tolerance;
   late num amountNeedToSave;
   late bool isSharingOn;
+  late String currentRideId;
 
   Users(
     this.createdAt,
@@ -33,6 +34,7 @@ class Users {
     this.tolerance,
     this.amountNeedToSave,
     this.isSharingOn,
+    this.currentRideId,
   );
 
   Users.fromJson(Map<String, dynamic> map) {
@@ -52,6 +54,7 @@ class Users {
     tolerance = map['tolerance'];
     amountNeedToSave = map['amountNeedToSave'];
     isSharingOn = map['isSharingOn'];
+    currentRideId = map['currentRideId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,6 +75,7 @@ class Users {
       'tolerance': tolerance,
       'amountNeedToSave': amountNeedToSave,
       'isSharingOn': isSharingOn,
+      'currentRideId': currentRideId,
     };
   }
 }

@@ -19,6 +19,7 @@ class UsersEntity {
   late int tolerance;
   late int amountNeedToSave;
   late bool isSharingOn;
+  late String currentRideId;
 
   UsersEntity(
     this.createdAt,
@@ -37,5 +38,6 @@ class UsersEntity {
     this.tolerance,
     this.amountNeedToSave,
     this.isSharingOn,
+    this.currentRideId,
   );
 }

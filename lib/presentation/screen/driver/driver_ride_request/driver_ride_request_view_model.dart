@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
-import 'package:google_maps_webservice/directions.dart' as direction;
 
 import '../../../../data/network/model/rides.dart';
 import '../../../../domain/repositories/i_driver_ride_request_repository.dart';
@@ -64,14 +63,14 @@ class DriverRideRequestViewModel extends ChangeNotifier {
         _ridesList = value.data;
         _ridesRequestData.clear();
         for (int i = 0; i < _ridesList.length; i++) {
-          await _getDistanceAndTimeBetweenTwoPoints(
+          await getDistanceAndTimeBetweenSourceAndDestination(
             _driverLocation,
             LatLng(
               _ridesList[i].pickupUser1Latitude,
               _ridesList[i].pickupUser1Longitude,
             ),
           ).then((value1) async {
-            await _getDistanceAndTimeBetweenTwoPoints(
+            await getDistanceAndTimeBetweenSourceAndDestination(
               LatLng(
                 _ridesList[i].pickupUser1Latitude,
                 _ridesList[i].pickupUser1Longitude,
@@ -83,50 +82,25 @@ class DriverRideRequestViewModel extends ChangeNotifier {
             ).then((value2) {
               _ridesRequestData.add([
                 _ridesList[i].fareReceivedByDriver.toDouble(),
-                value1[0],
-                value1[1],
-                'Address',
-                value2[0],
-                value2[1],
-                'Address',
+                getMToKmFormattedNumber(value1[0]),
+                getSecToTimeFormattedNumber(value1[1].toInt()),
+                _ridesList[i].pickupUser1Address,
+                getMToKmFormattedNumber(value2[0]),
+                getSecToTimeFormattedNumber(value2[1].toInt()),
+                _ridesList[i].destinationUser1Address,
               ]);
               if (_ridesRequestData.length == _ridesList.length) {
                 _isLoading = false;
                 notifyListeners();
               }
             });
+          }).onError((error, stackTrace) {
+            // todo
+            debugPrint('Manan Error1: $error');
           });
         }
       }
     });
-  }
-
-  Future<List<Object>> _getDistanceAndTimeBetweenTwoPoints(
-    LatLng pickupLatLng,
-    LatLng destinationLatLng,
-  ) async {
-    direction.GoogleMapsDirections directionsApi =
-        direction.GoogleMapsDirections(
-      apiKey: googleMapsApiKey,
-    );
-    direction.DirectionsResponse response =
-        await directionsApi.directionsWithLocation(
-      direction.Location(
-        lat: pickupLatLng.latitude,
-        lng: pickupLatLng.longitude,
-      ),
-      direction.Location(
-        lat: destinationLatLng.latitude,
-        lng: destinationLatLng.longitude,
-      ),
-    );
-    if (response.isOkay) {
-      return [
-        response.routes[0].legs[0].distance.value.toString(),
-        response.routes[0].legs[0].duration.text
-      ];
-    }
-    return ['4 km', '600'];
   }
 
   void onSelectRide(

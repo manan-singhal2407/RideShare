@@ -65,6 +65,7 @@ class LoginViewModel extends ChangeNotifier {
           900,
           40,
           true,
+          '',
         );
         await _firebaseFirestore
             .collection('Users')
@@ -74,7 +75,7 @@ class LoginViewModel extends ChangeNotifier {
           await _usersDao.insertUsersEntity(convertUsersToUsersEntity(users)).then((value) {
             Navigator.pushNamedAndRemoveUntil(
               _context,
-              '/rider/home_screen',
+              '/rider_home_screen',
                   (r) => false,
             );
           });
@@ -112,6 +113,7 @@ class LoginViewModel extends ChangeNotifier {
         900,
         40,
         true,
+        '',
       );
       await _firebaseFirestore
           .collection('Users')
@@ -121,7 +123,7 @@ class LoginViewModel extends ChangeNotifier {
         await _usersDao.insertUsersEntity(convertUsersToUsersEntity(users)).then((value) {
           Navigator.pushNamedAndRemoveUntil(
             _context,
-            '/rider/home_screen',
+            '/rider_home_screen',
                 (r) => false,
           );
         });

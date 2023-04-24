@@ -18,12 +18,16 @@ class Rides {
   late double driverLongitude;
   late double pickupUser1Latitude;
   late double pickupUser1Longitude;
+  late String pickupUser1Address;
   late double destinationUser1Latitude;
   late double destinationUser1Longitude;
+  late String destinationUser1Address;
   late double pickupUser2Latitude;
   late double pickupUser2Longitude;
+  late String pickupUser2Address;
   late double destinationUser2Latitude;
   late double destinationUser2Longitude;
+  late String destinationUser2Address;
   late bool isSharingOnByUser1;
   late bool isSharingOnByUser2;
   late bool isSharingOnByDriver;
@@ -32,6 +36,8 @@ class Rides {
   late num amountNeedToSaveForUser1;
   late num amountNeedToSaveForUser2;
   late bool cancelledByUser;
+  late bool mergeWithOtherRequest;
+  late String mergeRideId;
   late Users? user1;
   late Users? user2;
   late Driver? driver;
@@ -53,12 +59,16 @@ class Rides {
     this.driverLongitude,
     this.pickupUser1Latitude,
     this.pickupUser1Longitude,
+    this.pickupUser1Address,
     this.destinationUser1Latitude,
     this.destinationUser1Longitude,
+    this.destinationUser1Address,
     this.pickupUser2Latitude,
     this.pickupUser2Longitude,
+    this.pickupUser2Address,
     this.destinationUser2Latitude,
     this.destinationUser2Longitude,
+    this.destinationUser2Address,
     this.isSharingOnByUser1,
     this.isSharingOnByUser2,
     this.isSharingOnByDriver,
@@ -67,6 +77,8 @@ class Rides {
     this.amountNeedToSaveForUser1,
     this.amountNeedToSaveForUser2,
     this.cancelledByUser,
+    this.mergeWithOtherRequest,
+    this.mergeRideId,
     this.user1,
     this.user2,
     this.driver,
@@ -89,12 +101,16 @@ class Rides {
     driverLongitude = map['driverLongitude'];
     pickupUser1Latitude = map['pickupUser1Latitude'];
     pickupUser1Longitude = map['pickupUser1Longitude'];
+    pickupUser1Address = map['pickupUser1Address'];
     destinationUser1Latitude = map['destinationUser1Latitude'];
     destinationUser1Longitude = map['destinationUser1Longitude'];
+    destinationUser1Address = map['destinationUser1Address'];
     pickupUser2Latitude = map['pickupUser2Latitude'];
     pickupUser2Longitude = map['pickupUser2Longitude'];
+    pickupUser2Address = map['pickupUser2Address'];
     destinationUser2Latitude = map['destinationUser2Latitude'];
     destinationUser2Longitude = map['destinationUser2Longitude'];
+    destinationUser2Address = map['destinationUser2Address'];
     isSharingOnByUser1 = map['isSharingOnByUser1'];
     isSharingOnByUser2 = map['isSharingOnByUser2'];
     isSharingOnByDriver = map['isSharingOnByDriver'];
@@ -103,6 +119,8 @@ class Rides {
     amountNeedToSaveForUser1 = map['amountNeedToSaveForUser1'];
     amountNeedToSaveForUser2 = map['amountNeedToSaveForUser2'];
     cancelledByUser = map['cancelledByUser'];
+    mergeWithOtherRequest = map['mergeWithOtherRequest'];
+    mergeRideId = map['mergeRideId'];
     user1 = Users.fromJson(map['User1'] as Map<String, dynamic>);
     user2 = map['User2'] != null
         ? Users.fromJson(map['User2'] as Map<String, dynamic>)
@@ -126,16 +144,20 @@ class Rides {
       'farePriceForUser1': farePriceForUser1,
       'farePriceForUser2': farePriceForUser2,
       'fareReceivedByDriver': fareReceivedByDriver,
-      'pickupUser1Latitude': pickupUser1Latitude,
       'driverLatitude': driverLatitude,
       'driverLongitude': driverLongitude,
+      'pickupUser1Latitude': pickupUser1Latitude,
       'pickupUser1Longitude': pickupUser1Longitude,
+      'pickupUser1Address': pickupUser1Address,
       'destinationUser1Latitude': destinationUser1Latitude,
       'destinationUser1Longitude': destinationUser1Longitude,
+      'destinationUser1Address': destinationUser1Address,
       'pickupUser2Latitude': pickupUser2Latitude,
       'pickupUser2Longitude': pickupUser2Longitude,
+      'pickupUser2Address': pickupUser2Address,
       'destinationUser2Latitude': destinationUser2Latitude,
       'destinationUser2Longitude': destinationUser2Longitude,
+      'destinationUser2Address': destinationUser2Address,
       'isSharingOnByUser1': isSharingOnByUser1,
       'isSharingOnByUser2': isSharingOnByUser2,
       'isSharingOnByDriver': isSharingOnByDriver,
@@ -144,6 +166,8 @@ class Rides {
       'amountNeedToSaveForUser1': amountNeedToSaveForUser1,
       'amountNeedToSaveForUser2': amountNeedToSaveForUser2,
       'cancelledByUser': cancelledByUser,
+      'mergeWithOtherRequest': mergeWithOtherRequest,
+      'mergeRideId': mergeRideId,
       'User1': user1?.toJson(),
       'User2': user2?.toJson(),
       'Driver': driver?.toJson(),
