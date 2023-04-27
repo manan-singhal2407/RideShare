@@ -1,5 +1,3 @@
-import 'package:btp/data/network/service/retrofit_service.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,7 +6,12 @@ import 'package:google_maps_webservice/directions.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/network/service/retrofit_service.dart';
+import '../base/injectable.dart';
+
 String googleMapsApiKey = 'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24';
+
+final RestClient _restClient = getIt<RestClient>();
 
 Future<route.Route?> getRouteInWaypoints(
   LatLng pickupLatLng,
@@ -36,17 +39,16 @@ Future<List<double>> getDistanceAndTimeBetweenSourceAndDestination(
   LatLng pickupLatLng,
   LatLng destinationLatLng,
 ) async {
-  await RestClient(Dio()).getDirectionData(
+  List<double> directionInfo = [1000000, 0];
+  await _restClient.getDirectionData(
     '${pickupLatLng.latitude},${pickupLatLng.longitude}',
     '${destinationLatLng.latitude},${destinationLatLng.longitude}',
     googleMapsApiKey,
   ).then((value) {
-    return [
-      value.routes[0].legs[0].distance.value.toDouble(),
-      value.routes[0].legs[0].duration.value.toDouble(),
-    ];
+    directionInfo[0] = value.routes[0].legs[0].distance.value.toDouble();
+    directionInfo[1] = value.routes[0].legs[0].duration.value.toDouble();
   });
-  return [100000, 0];
+  return directionInfo;
 }
 
 void showScaffoldMessenger(

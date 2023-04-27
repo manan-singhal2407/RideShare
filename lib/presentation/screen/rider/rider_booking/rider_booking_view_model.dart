@@ -144,27 +144,20 @@ class RiderBookingViewModel extends ChangeNotifier {
   }
 
   void _getDistanceAndTimeBetweenSourceAndDestination() async {
-    direction.GoogleMapsDirections directionsApi =
-        direction.GoogleMapsDirections(
-      apiKey: googleMapsApiKey,
-    );
-    direction.DirectionsResponse response = await directionsApi.directionsWithLocation(
-      direction.Location(
-        lat: _pickupLatLng.latitude,
-        lng: _pickupLatLng.longitude,
+    await getDistanceAndTimeBetweenSourceAndDestination(
+      LatLng(
+        _pickupLatLng.latitude,
+        _pickupLatLng.longitude,
       ),
-      direction.Location(
-        lat: _destinationLatLng.latitude,
-        lng: _destinationLatLng.longitude,
+      LatLng(
+        _destinationLatLng.latitude,
+        _destinationLatLng.longitude,
       ),
-    );
-    if (response.isOkay) {
-      _distanceBetweenSourceAndDestination =
-          response.routes[0].legs[0].distance.value.toDouble();
-      _timeTakenBetweenSourceAndDestination =
-          response.routes[0].legs[0].duration.text;
+    ).then((value) {
+      _distanceBetweenSourceAndDestination = value[0];
+      _timeTakenBetweenSourceAndDestination = getSecToTimeFormattedNumber(value[1].toInt());
       notifyListeners();
-    }
+    });
   }
 
   void _getPolylinesBetweenSourceAndDestination() async {
