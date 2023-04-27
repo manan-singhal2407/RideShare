@@ -1,3 +1,5 @@
+import 'package:btp/data/network/service/retrofit_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -34,23 +36,16 @@ Future<List<double>> getDistanceAndTimeBetweenSourceAndDestination(
   LatLng pickupLatLng,
   LatLng destinationLatLng,
 ) async {
-  // todo change this method to retrofit api calling
-  debugPrint('Manan Error2: isInvalid}');
-  GoogleMapsDirections directionsApi = GoogleMapsDirections(
-    apiKey: googleMapsApiKey,
-  );
-  DirectionsResponse response = await directionsApi.directionsWithLocation(
-    Location(lat: pickupLatLng.latitude, lng: pickupLatLng.longitude),
-    Location(lat: destinationLatLng.latitude, lng: destinationLatLng.longitude),
-    // travelMode: TravelMode.driving,
-  );
-  if (response.isOkay) {
-    debugPrint('Manan Error2: error');
+  await RestClient(Dio()).getDirectionData(
+    '${pickupLatLng.latitude},${pickupLatLng.longitude}',
+    '${destinationLatLng.latitude},${destinationLatLng.longitude}',
+    googleMapsApiKey,
+  ).then((value) {
     return [
-      response.routes[0].legs[0].distance.value.toDouble(),
-      response.routes[0].legs[0].duration.value.toDouble(),
+      value.routes[0].legs[0].distance.value.toDouble(),
+      value.routes[0].legs[0].duration.value.toDouble(),
     ];
-  }
+  });
   return [100000, 0];
 }
 

@@ -11,9 +11,14 @@ class Rides {
   late num reachedPickupUser2At;
   late num reachedDestinationUser1At;
   late num reachedDestinationUser2At;
+  late num initialFareForUser1;
+  late num initialFareForUser2;
+  late num initialFareReceivedByDriver;
   late num farePriceForUser1;
   late num farePriceForUser2;
   late num fareReceivedByDriver;
+  late num idealTimeToDropUser1;
+  late num idealTimeToDropUser2;
   late double driverLatitude;
   late double driverLongitude;
   late double pickupUser1Latitude;
@@ -37,7 +42,9 @@ class Rides {
   late num amountNeedToSaveForUser2;
   late bool cancelledByUser;
   late bool mergeWithOtherRequest;
+  late bool isRideOver;
   late String mergeRideId;
+  late String mergePath;
   late Users? user1;
   late Users? user2;
   late Driver? driver;
@@ -52,9 +59,14 @@ class Rides {
     this.reachedPickupUser2At,
     this.reachedDestinationUser1At,
     this.reachedDestinationUser2At,
+    this.initialFareForUser1,
+    this.initialFareForUser2,
+    this.initialFareReceivedByDriver,
     this.farePriceForUser1,
     this.farePriceForUser2,
     this.fareReceivedByDriver,
+    this.idealTimeToDropUser1,
+    this.idealTimeToDropUser2,
     this.driverLatitude,
     this.driverLongitude,
     this.pickupUser1Latitude,
@@ -78,7 +90,9 @@ class Rides {
     this.amountNeedToSaveForUser2,
     this.cancelledByUser,
     this.mergeWithOtherRequest,
+    this.isRideOver,
     this.mergeRideId,
+    this.mergePath,
     this.user1,
     this.user2,
     this.driver,
@@ -94,9 +108,14 @@ class Rides {
     reachedPickupUser2At = map['reachedPickupUser2At'];
     reachedDestinationUser1At = map['reachedDestinationUser1At'];
     reachedDestinationUser2At = map['reachedDestinationUser2At'];
+    initialFareForUser1 = map['initialFareForUser1'];
+    initialFareForUser2 = map['initialFareForUser2'];
+    initialFareReceivedByDriver = map['initialFareReceivedByDriver'];
     farePriceForUser1 = map['farePriceForUser1'];
     farePriceForUser2 = map['farePriceForUser2'];
     fareReceivedByDriver = map['fareReceivedByDriver'];
+    idealTimeToDropUser1 = map['idealTimeToDropUser1'];
+    idealTimeToDropUser2 = map['idealTimeToDropUser2'];
     driverLatitude = map['driverLatitude'];
     driverLongitude = map['driverLongitude'];
     pickupUser1Latitude = map['pickupUser1Latitude'];
@@ -120,7 +139,9 @@ class Rides {
     amountNeedToSaveForUser2 = map['amountNeedToSaveForUser2'];
     cancelledByUser = map['cancelledByUser'];
     mergeWithOtherRequest = map['mergeWithOtherRequest'];
+    isRideOver = map['isRideOver'];
     mergeRideId = map['mergeRideId'];
+    mergePath = map['mergePath'];
     user1 = Users.fromJson(map['User1'] as Map<String, dynamic>);
     user2 = map['User2'] != null
         ? Users.fromJson(map['User2'] as Map<String, dynamic>)
@@ -141,9 +162,14 @@ class Rides {
       'reachedPickupUser2At': reachedPickupUser2At,
       'reachedDestinationUser1At': reachedDestinationUser1At,
       'reachedDestinationUser2At': reachedDestinationUser2At,
+      'initialFareForUser1': initialFareForUser1,
+      'initialFareForUser2': initialFareForUser2,
+      'initialFareReceivedByDriver': initialFareReceivedByDriver,
       'farePriceForUser1': farePriceForUser1,
       'farePriceForUser2': farePriceForUser2,
       'fareReceivedByDriver': fareReceivedByDriver,
+      'idealTimeToDropUser1': idealTimeToDropUser1,
+      'idealTimeToDropUser2': idealTimeToDropUser2,
       'driverLatitude': driverLatitude,
       'driverLongitude': driverLongitude,
       'pickupUser1Latitude': pickupUser1Latitude,
@@ -167,7 +193,9 @@ class Rides {
       'amountNeedToSaveForUser2': amountNeedToSaveForUser2,
       'cancelledByUser': cancelledByUser,
       'mergeWithOtherRequest': mergeWithOtherRequest,
+      'isRideOver': isRideOver,
       'mergeRideId': mergeRideId,
+      'mergePath': mergePath,
       'User1': user1?.toJson(),
       'User2': user2?.toJson(),
       'Driver': driver?.toJson(),

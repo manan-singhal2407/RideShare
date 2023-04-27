@@ -211,6 +211,7 @@ class RiderBookingViewModel extends ChangeNotifier {
   void onBookSwiftClicked() async {
     _showCarBookingLoadingView = true;
     notifyListeners();
+    // todo ideal time wrong
     Rides rides = Rides(
       '',
       DateTime.now().millisecondsSinceEpoch,
@@ -221,9 +222,14 @@ class RiderBookingViewModel extends ChangeNotifier {
       0,
       0,
       0,
+      _distanceBetweenSourceAndDestination / 50 + 15,
+      0,
       _distanceBetweenSourceAndDestination / 50,
       0,
-      _distanceBetweenSourceAndDestination / 60,
+      0,
+      0,
+      DateTime.now().millisecondsSinceEpoch + 360000 + 7200000,
+      0,
       0,
       0,
       _pickupLatLng.latitude,
@@ -241,12 +247,14 @@ class RiderBookingViewModel extends ChangeNotifier {
       _isCarPoolingEnabled,
       false,
       false,
-      int.parse(_toleranceTimeController.text) * 60,
+      int.parse(_toleranceTimeController.text) * 60000,
       0,
-      int.parse(_toleranceTimeController.text),
+      int.parse(_amountNeedToSaveController.text),
       0,
       false,
       false,
+      false,
+      '',
       '',
       _users,
       null,
@@ -267,7 +275,7 @@ class RiderBookingViewModel extends ChangeNotifier {
           if (value.data != null) {
             Rides rides1 = value.data as Rides;
             if (rides1.approvedRide1At != 0) {
-              // todo sent to next screen with new ride id
+              // todo sent to next screen with ride id
             }
             if (_loadingViewValues[0] == 1 && _loadingViewValues[2] == 0) {
               _loadingViewValues[1] = 1;
