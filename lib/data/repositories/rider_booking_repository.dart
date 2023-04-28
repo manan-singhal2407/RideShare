@@ -93,6 +93,7 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .where('isSharingOnByDriver', isEqualTo: true)
         .where('isSharingOnByUser1', isEqualTo: true)
         .where('isSharingOnByUser2', isEqualTo: false)
+        .where('cancelledByUser', isEqualTo: false)
         .where('isRideOver', isEqualTo: false)
         .get()
         .then((value) async {
@@ -629,6 +630,7 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .collection('Driver')
         .where('isDrivingOn', isEqualTo: true)
         .where('isSinglePersonInCar', isEqualTo: false)
+        .where('cancelledByUser', isEqualTo: false)
         .get()
         .then((value) async {
       List<Driver> driverList = [];
@@ -685,6 +687,49 @@ class RiderBookingRepository implements IRiderBookingRepository {
           });
         }
       }
+    });
+    if (onSuccess) {
+      return DataState.success(true);
+    } else {
+      return DataState.error(null, null);
+    }
+  }
+
+  @override
+  Future<DataState> cancelRideByUser(String rideId) async {
+    bool onSuccess = false;
+    await _firebaseFirestore
+        .collection('Rides')
+        .doc(rideId)
+        .update({'cancelledByUser': true}).then((value) async {
+      await _firebaseFirestore
+          .collection('Users')
+          .doc(_firebaseAuth.currentUser?.uid)
+          .collection('Request')
+          .get()
+          .then((value) async {
+        if (value.docs.isEmpty) {
+          onSuccess = true;
+        }
+        for (int i = 0; i < value.docs.length; i++) {
+          String driverUid = (value.docs)[i]['driverUid'];
+          await _firebaseFirestore
+              .collection('Driver')
+              .doc(driverUid)
+              .collection('Request')
+              .doc(rideId)
+              .delete();
+          await _firebaseFirestore
+              .collection('Users')
+              .doc(_firebaseAuth.currentUser?.uid)
+              .collection('Request')
+              .doc(driverUid)
+              .delete()
+              .then((value) {
+            onSuccess = true;
+          });
+        }
+      });
     });
     if (onSuccess) {
       return DataState.success(true);

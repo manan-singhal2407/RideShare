@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/directions.dart' as direction;
 
 import '../../../../data/cache/database/entities/users_entity.dart';
 import '../../../../data/network/model/rides.dart';
@@ -14,6 +14,7 @@ import '../../../../domain/repositories/i_rider_booking_repository.dart';
 import '../../../../domain/state/data_state.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
+import '../../../theme/color.dart';
 
 class RiderBookingViewModel extends ChangeNotifier {
   final IRiderBookingRepository _riderBookingRepository =
@@ -32,10 +33,11 @@ class RiderBookingViewModel extends ChangeNotifier {
   Marker? _sourcePosition, _destinationPosition;
 
   double _distanceBetweenSourceAndDestination = -100;
-  String? _timeTakenBetweenSourceAndDestination;
+  double _timeTakenBetweenSourceAndDestination = -100;
   String _pickupAddress = 'Loading...';
   String _destinationAddress = 'Loading...';
 
+  Rides? _rides;
   Users? _users;
   bool _isCarPoolingEnabled = false;
   final TextEditingController _toleranceTimeController =
@@ -44,11 +46,13 @@ class RiderBookingViewModel extends ChangeNotifier {
       TextEditingController();
 
   StreamSubscription<DataState>? _streamSubscription;
-  final StreamController<DataState> _streamController =
+  late StreamController<DataState> _streamController =
       StreamController<DataState>.broadcast();
   Timer? _delayedFreeDriverCall;
+  Timer? _delayedCancelButtonOption;
 
   bool _showCarBookingLoadingView = false;
+  bool _showCarBookingCancelButton = false;
   String _loadingViewText = 'Confirming your ride';
   final List<double?> _loadingViewValues = [null, 0, 0, 0];
 
@@ -96,7 +100,7 @@ class RiderBookingViewModel extends ChangeNotifier {
   double get distanceBetweenSourceAndDestination =>
       _distanceBetweenSourceAndDestination;
 
-  String? get timeTakenBetweenSourceAndDestination =>
+  double get timeTakenBetweenSourceAndDestination =>
       _timeTakenBetweenSourceAndDestination;
 
   bool get isCarPoolingEnabled => _isCarPoolingEnabled;
@@ -107,6 +111,8 @@ class RiderBookingViewModel extends ChangeNotifier {
       _amountNeedToSaveController;
 
   bool get showCarBookingLoadingView => _showCarBookingLoadingView;
+
+  bool get showCarBookingCancelButton => _showCarBookingCancelButton;
 
   String get loadingViewText => _loadingViewText;
 
@@ -155,7 +161,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       ),
     ).then((value) {
       _distanceBetweenSourceAndDestination = value[0];
-      _timeTakenBetweenSourceAndDestination = getSecToTimeFormattedNumber(value[1].toInt());
+      _timeTakenBetweenSourceAndDestination = value[1];
       notifyListeners();
     });
   }
@@ -204,8 +210,7 @@ class RiderBookingViewModel extends ChangeNotifier {
   void onBookSwiftClicked() async {
     _showCarBookingLoadingView = true;
     notifyListeners();
-    // todo ideal time wrong
-    Rides rides = Rides(
+    _rides = Rides(
       '',
       DateTime.now().millisecondsSinceEpoch,
       0,
@@ -221,7 +226,9 @@ class RiderBookingViewModel extends ChangeNotifier {
       0,
       0,
       0,
-      DateTime.now().millisecondsSinceEpoch + 360000 + 7200000,
+      DateTime.now().millisecondsSinceEpoch +
+          300000 +
+          _timeTakenBetweenSourceAndDestination * 1000,
       0,
       0,
       0,
@@ -253,22 +260,24 @@ class RiderBookingViewModel extends ChangeNotifier {
       null,
       null,
     );
-    await _riderBookingRepository.saveRideToDatabase(rides).then((value) async {
+    await _riderBookingRepository
+        .saveRideToDatabase(_rides!)
+        .then((value) async {
       if (value.data != null) {
-        rides.rideId = value.data as String;
+        _rides?.rideId = value.data as String;
         _loadingViewValues[0] = 1;
         _loadingViewValues[1] = null;
         _loadingViewText = 'Connecting with driver';
         notifyListeners();
         _riderBookingRepository.createContinuousConnectionBetweenDatabase(
-          rides.rideId,
+          (_rides?.rideId)!,
           _streamController,
         );
         _streamSubscription = _streamController.stream.listen((value) async {
           if (value.data != null) {
             Rides rides1 = value.data as Rides;
             if (rides1.approvedRide1At != 0) {
-              // todo sent to next screen with ride id
+              // todo sent to next screen with ride id and finish()
             }
             if (_loadingViewValues[0] == 1 && _loadingViewValues[2] == 0) {
               _loadingViewValues[1] = 1;
@@ -276,12 +285,12 @@ class RiderBookingViewModel extends ChangeNotifier {
               if (_isCarPoolingEnabled) {
                 _loadingViewValues[2] = null;
                 notifyListeners();
-                sendRequestToSharedDriver(rides);
+                _sendRequestToSharedDriver(_rides!);
               } else {
                 _loadingViewValues[2] = 1;
                 _loadingViewValues[3] = null;
                 notifyListeners();
-                sendRequestToFreeDriver(rides);
+                _sendRequestToFreeDriver(_rides!);
               }
             }
           }
@@ -290,35 +299,72 @@ class RiderBookingViewModel extends ChangeNotifier {
     });
   }
 
-  void sendRequestToSharedDriver(Rides rides) async {
+  void _sendRequestToSharedDriver(Rides rides) async {
     await _riderBookingRepository
         .sendRideRequestForSharedDriver(rides)
         .then((value) async {
-      if (value.data != null) {
-        _delayedFreeDriverCall = Timer(const Duration(seconds: 30), () {
-          _loadingViewValues[2] = 1;
-          _loadingViewValues[3] = null;
-          notifyListeners();
-          sendRequestToFreeDriver(rides);
-        });
-      }
+      _delayedFreeDriverCall = Timer(const Duration(seconds: 30), () {
+        _loadingViewValues[2] = 1;
+        _loadingViewValues[3] = null;
+        notifyListeners();
+        _sendRequestToFreeDriver(rides);
+      });
     });
   }
 
-  void sendRequestToFreeDriver(Rides rides) async {
+  void _sendRequestToFreeDriver(Rides rides) async {
     await _riderBookingRepository
         .sendRideRequestForFreeDriver(rides)
         .then((value) async {
       if (value.data != null) {
-        // todo after doing this for minute go back to previous screen with cancelRideByUser set to true.
+        _delayedCancelButtonOption = Timer(const Duration(seconds: 30), () {
+          _showCarBookingCancelButton = true;
+          notifyListeners();
+        });
+      } else {
+        _showCarBookingCancelButton = true;
         notifyListeners();
       }
     });
   }
 
+  void onCancelRideClicked() async {
+    showLoadingDialogBox(_context);
+    await _riderBookingRepository
+        .cancelRideByUser((_rides?.rideId)!)
+        .then((value) async {
+      Navigator.pop(_context);
+      if (value.data != null) {
+        _rides?.rideId = '';
+        _streamSubscription?.cancel();
+        _streamController.close();
+        _streamController = StreamController<DataState>.broadcast();
+        _delayedFreeDriverCall?.cancel();
+        _delayedCancelButtonOption?.cancel();
+        _rides = null;
+        _loadingViewText = 'Confirming your ride';
+        _loadingViewValues[0] = null;
+        _loadingViewValues[1] = 0;
+        _loadingViewValues[2] = 0;
+        _loadingViewValues[3] = 0;
+        _showCarBookingCancelButton = false;
+        _showCarBookingLoadingView = false;
+        notifyListeners();
+      } else {
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
+      }
+    });
+  }
+
   void disposeScreen() async {
+    // todo need to call this
     _streamSubscription?.cancel();
     _streamController.close();
     _delayedFreeDriverCall?.cancel();
+    _delayedCancelButtonOption?.cancel();
   }
 }

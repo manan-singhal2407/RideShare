@@ -236,6 +236,18 @@ class _RiderBookingPageState extends State<RiderBookingPage> {
                       const SizedBox(
                         height: 12,
                       ),
+                      if (viewModel.showCarBookingCancelButton) ...[
+                        Center(
+                          child: SecondaryAppButton(
+                            width: 120,
+                            text: 'Cancel ride',
+                            onPressed: viewModel.onCancelRideClicked,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                      ],
                     ],
                   ),
                 ] else ...[
@@ -286,9 +298,12 @@ class _RiderBookingPageState extends State<RiderBookingPage> {
                                       width: 12,
                                     ),
                                     Text(
-                                      viewModel
-                                          .timeTakenBetweenSourceAndDestination
-                                          .toString(),
+                                      viewModel.timeTakenBetweenSourceAndDestination !=
+                                              -100
+                                          ? getSecToTimeFormattedNumber(viewModel
+                                              .timeTakenBetweenSourceAndDestination
+                                              .toInt())
+                                          : '-',
                                       style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
                                           color: secondaryTextColor,

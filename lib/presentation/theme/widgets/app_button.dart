@@ -36,6 +36,43 @@ class PrimaryAppButton extends StatelessWidget {
           style: GoogleFonts.openSans(
             textStyle: const TextStyle(
               fontWeight: FontWeight.bold,
+              color: primaryTextColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondaryAppButton extends StatelessWidget {
+  const SecondaryAppButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.width,
+  });
+
+  final String text;
+  final VoidCallback onPressed;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: 48,
+      child: OutlinedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: GoogleFonts.openSans(
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: secondaryTextColor,
             ),
           ),
         ),

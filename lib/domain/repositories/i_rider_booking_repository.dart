@@ -18,4 +18,6 @@ abstract class IRiderBookingRepository {
   Future<DataState> sendRideRequestForSharedDriver(Rides rides);
 
   Future<DataState> sendRideRequestForFreeDriver(Rides rides);
+
+  Future<DataState> cancelRideByUser(String rideId);
 }
