@@ -1,8 +1,11 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart' as route;
-import 'package:google_maps_webservice/directions.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,16 +20,16 @@ final RestClient _restClient = getIt<RestClient>();
 Future<route.Route?> getRouteInWaypoints(
   LatLng pickupLatLng,
   LatLng destinationLatLng,
-  List<Waypoint> waypoints,
+  List<route.Waypoint> waypoints,
   num? departureTime,
 ) async {
-  GoogleMapsDirections directionsApi = GoogleMapsDirections(
+  route.GoogleMapsDirections directionsApi = route.GoogleMapsDirections(
     apiKey: googleMapsApiKey,
   );
-  DirectionsResponse response = await directionsApi.directionsWithLocation(
-    Location(lat: pickupLatLng.latitude, lng: pickupLatLng.longitude),
-    Location(lat: destinationLatLng.latitude, lng: destinationLatLng.longitude),
-    travelMode: TravelMode.driving,
+  route.DirectionsResponse response = await directionsApi.directionsWithLocation(
+    route.Location(lat: pickupLatLng.latitude, lng: pickupLatLng.longitude),
+    route.Location(lat: destinationLatLng.latitude, lng: destinationLatLng.longitude),
+    travelMode: route.TravelMode.driving,
     departureTime: departureTime ?? 'now',
     waypoints: waypoints,
   );
@@ -41,15 +44,56 @@ Future<List<double>> getDistanceAndTimeBetweenSourceAndDestination(
   LatLng destinationLatLng,
 ) async {
   List<double> directionInfo = [1000000, 0];
-  await _restClient.getDirectionData(
+  await _restClient
+      .getDirectionData(
     '${pickupLatLng.latitude},${pickupLatLng.longitude}',
     '${destinationLatLng.latitude},${destinationLatLng.longitude}',
     googleMapsApiKey,
-  ).then((value) {
+  )
+      .then((value) {
     directionInfo[0] = value.routes[0].legs[0].distance.value.toDouble();
     directionInfo[1] = value.routes[0].legs[0].duration.value.toDouble();
   });
   return directionInfo;
+}
+
+Future<Polyline> getPolylineBetweenTwoPoints(
+  LatLng pickupLatLng,
+  LatLng destinationLatLng,
+) async {
+  List<LatLng> polylineCoordinates = [];
+  List<dynamic> points = [];
+  final PolylinePoints polylinePoints = PolylinePoints();
+  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    googleMapsApiKey,
+    PointLatLng(pickupLatLng.latitude, pickupLatLng.longitude),
+    PointLatLng(destinationLatLng.latitude, destinationLatLng.longitude),
+  );
+  if (result.points.isNotEmpty) {
+    for (var point in result.points) {
+      polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      points.add({'lat': point.latitude, 'lng': point.longitude});
+    }
+  }
+  PolylineId id = const PolylineId('route');
+  Polyline polyline = Polyline(
+    polylineId: id,
+    color: Colors.blue.withOpacity(0.8),
+    points: polylineCoordinates,
+    width: 4,
+  );
+
+  return polyline;
+}
+
+Future<Uint8List> getUint8ListImages(String path, int width) async {
+  ByteData data = await rootBundle.load(path);
+  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+      targetHeight: width);
+  ui.FrameInfo fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+      .buffer
+      .asUint8List();
 }
 
 void showScaffoldMessenger(

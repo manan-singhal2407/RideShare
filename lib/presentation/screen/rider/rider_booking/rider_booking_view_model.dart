@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:btp/presentation/screen/rider/rider_rides/arguments/rider_rides_screen_arguments.dart';
 import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -72,6 +73,7 @@ class RiderBookingViewModel extends ChangeNotifier {
     if (_rideId.isNotEmpty) {
       _isLoadingRideInfo = true;
       _showCarBookingLoadingView = true;
+      _loadingViewValues[0] = 0;
       _getRideInfoFromRideId();
     } else {
       _isCarPoolingEnabled = _isSharingOn;
@@ -171,8 +173,13 @@ class RiderBookingViewModel extends ChangeNotifier {
         _rides = value.data as Rides;
         _isLoadingRideInfo = false;
         if (_rides?.driver != null) {
-          // todo check from merge ride id if exists
-          // todo sent to next screen with ride id and finish()
+          Navigator.pushReplacementNamed(
+            _context,
+            '/rider_rides_screen',
+            arguments: RiderRidesScreenArguments(
+              (_rides?.mergeWithOtherRequest)! ? (_rides?.mergeRideId)! : (_rides?.rideId)!,
+            ),
+          );
         } else {
           _createConnectionBetweenDatabase();
         }
@@ -308,7 +315,13 @@ class RiderBookingViewModel extends ChangeNotifier {
       if (value.data != null) {
         Rides rides1 = value.data as Rides;
         if (rides1.approvedRide1At != 0) {
-          // todo sent to next screen with ride id and finish()
+          Navigator.pushReplacementNamed(
+            _context,
+            '/rider_rides_screen',
+            arguments: RiderRidesScreenArguments(
+              rides1.mergeWithOtherRequest ? rides1.mergeRideId : rides1.rideId,
+            ),
+          );
         }
         if (_loadingViewValues[0] == 1 && _loadingViewValues[2] == 0) {
           _loadingViewValues[1] = 1;
@@ -390,7 +403,6 @@ class RiderBookingViewModel extends ChangeNotifier {
   }
 
   void disposeScreen() async {
-    // todo need to call this
     _streamSubscription?.cancel();
     _streamController.close();
     _delayedFreeDriverCall?.cancel();

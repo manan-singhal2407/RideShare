@@ -10,6 +10,8 @@ import 'package:btp/presentation/screen/login/login_page.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/screen/rider/rider_home/rider_home_page.dart';
+import 'package:btp/presentation/screen/rider/rider_rides/arguments/rider_rides_screen_arguments.dart';
+import 'package:btp/presentation/screen/rider/rider_rides/rider_rides_page.dart';
 import 'package:btp/presentation/screen/rider/rider_settings/arguments/rider_settings_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_settings/rider_settings_page.dart';
 import 'package:btp/presentation/screen/search/arguments/search_screen_arguments.dart';
@@ -91,6 +93,15 @@ class MyApp extends StatelessWidget {
                 amountNeedToSave: arguments.amountNeedToSave,
                 pickupLatLng: arguments.pickupLatLng,
                 destinationLatLng: arguments.destinationLatLng,
+              );
+            },
+          );
+        } else if (settings.name == '/rider_rides_screen') {
+          final arguments = settings.arguments as RiderRidesScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return RiderRidesPage(
+                rideId: arguments.rideId,
               );
             },
           );
