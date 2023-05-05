@@ -13,6 +13,7 @@ import '../../../../domain/repositories/i_rider_home_repository.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
 import '../../../theme/widgets/loading.dart';
+import '../rider_booking/arguments/rider_booking_screen_arguments.dart';
 
 class RiderHomeViewModel extends ChangeNotifier {
   final IRiderHomeRepository _riderHomeRepository =
@@ -20,7 +21,7 @@ class RiderHomeViewModel extends ChangeNotifier {
 
   final BuildContext _context;
 
-  late LatLng _pickUpLocation = const LatLng(30.7333, 76.7794);
+  late LatLng _pickUpLocation = defaultLatLng;
   loc.Location location = loc.Location();
   loc.LocationData? _currentPosition;
   final Completer<GoogleMapController?> _controller = Completer();
@@ -79,10 +80,18 @@ class RiderHomeViewModel extends ChangeNotifier {
         notifyListeners();
 
         if ((_users?.currentRideId)!.isNotEmpty) {
-          // todo
+          // todo redirect to rider booking page
           Navigator.pushNamed(
             _context,
-            '/rider_rides_screen',
+            '/rider_booking_screen',
+            arguments: RiderBookingScreenArguments(
+              (_users?.currentRideId)!,
+              false,
+              0,
+              0,
+              defaultLatLng,
+              defaultLatLng,
+            ),
           );
         }
       }

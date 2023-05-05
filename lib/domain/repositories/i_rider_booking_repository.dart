@@ -8,6 +8,8 @@ abstract class IRiderBookingRepository {
 
   Future<DataState> getUserDataFromDatabase();
 
+  Future<DataState> getRideInfoFromDatabase(String rideId);
+
   Future<DataState> saveRideToDatabase(Rides rides);
 
   void createContinuousConnectionBetweenDatabase(

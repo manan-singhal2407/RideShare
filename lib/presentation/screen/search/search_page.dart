@@ -1,5 +1,4 @@
 import 'package:btp/presentation/extension/utils_extension.dart';
-import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/theme/color.dart';
@@ -113,6 +112,7 @@ class _SearchPageState extends State<SearchPage> {
                                   context,
                                   '/rider_booking_screen',
                                   arguments: RiderBookingScreenArguments(
+                                    '',
                                     true,
                                     900,
                                     50,

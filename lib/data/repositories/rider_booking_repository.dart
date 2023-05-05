@@ -48,6 +48,19 @@ class RiderBookingRepository implements IRiderBookingRepository {
   }
 
   @override
+  Future<DataState> getRideInfoFromDatabase(String rideId) async {
+    Rides? rides;
+    await _firebaseFirestore
+        .collection('Rides')
+        .doc(rideId)
+        .get()
+        .then((value) async {
+      rides = Rides.fromJson(value.data()!);
+    });
+    return DataState.success(rides);
+  }
+
+  @override
   Future<DataState> saveRideToDatabase(Rides rides) async {
     bool onSuccess = false;
     String rideId = '';
@@ -55,13 +68,28 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .collection('Rides')
         .add(rides.toJson())
         .then((ridesReference) async {
+      String rideId = ridesReference.id;
       await _firebaseFirestore
           .collection('Rides')
-          .doc(ridesReference.id)
-          .update({'rideId': ridesReference.id}).then(
-              (documentReference) async {
-        rideId = ridesReference.id;
-        onSuccess = true;
+          .doc(rideId)
+          .update({'rideId': rideId}).then((documentReference) async {
+        await _firebaseFirestore
+            .collection('Users')
+            .doc(_firebaseAuth.currentUser?.uid)
+            .update({'currentRideId': rideId}).then((documentReference) async {
+          await _firebaseFirestore
+              .collection('Users')
+              .doc(_firebaseAuth.currentUser?.uid)
+              .get()
+              .then((value) async {
+            await _usersDao.insertUsersEntity(
+              convertUsersToUsersEntity(
+                Users.fromJson(value.data()!),
+              ),
+            );
+            onSuccess = true;
+          });
+        });
       });
     });
     if (onSuccess) {
@@ -635,6 +663,9 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .then((value) async {
       List<Driver> driverList = [];
       List<double> driverDistanceList = [];
+      if (value.docs.isEmpty) {
+        onSuccess = true;
+      }
       for (int i = 0; i < value.docs.length; i++) {
         driverList.add(Driver.fromJson(value.docs[i].data()));
         await getDistanceAndTimeBetweenSourceAndDestination(

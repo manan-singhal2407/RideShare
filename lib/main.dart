@@ -1,6 +1,4 @@
 import 'package:btp/presentation/base/injectable.dart';
-import 'package:btp/presentation/screen/booking/arguments/booking_screen_arguments.dart';
-import 'package:btp/presentation/screen/booking/booking_page.dart';
 import 'package:btp/presentation/screen/driver/driver_home/driver_home_page.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request/driver_ride_request_page.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/arguments/driver_ride_request_detail_screen_arguments.dart';
@@ -71,16 +69,6 @@ class MyApp extends StatelessWidget {
               );
             },
           );
-        } else if (settings.name == '/rider/booking_screen') {
-          final arguments = settings.arguments as BookingScreenArguments;
-          return MaterialPageRoute(
-            builder: (context) {
-              return BookingPage(
-                pickupLatLng: arguments.pickupLatLng,
-                destinationLatLng: arguments.destinationLatLng,
-              );
-            },
-          );
         } else if (settings.name == '/rider_settings_screen') {
           final arguments = settings.arguments as RiderSettingsScreenArguments;
           return MaterialPageRoute(
@@ -97,6 +85,7 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder: (context) {
               return RiderBookingPage(
+                rideId: arguments.rideId,
                 isSharingOn: arguments.isSharingOn,
                 tolerance: arguments.tolerance,
                 amountNeedToSave: arguments.amountNeedToSave,

@@ -21,6 +21,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       getIt<IRiderBookingRepository>();
 
   final BuildContext _context;
+  final String _rideId;
   final bool _isSharingOn;
   final int _tolerance;
   final int _amountNeedToSave;
@@ -37,6 +38,7 @@ class RiderBookingViewModel extends ChangeNotifier {
   String _pickupAddress = 'Loading...';
   String _destinationAddress = 'Loading...';
 
+  bool _isLoadingRideInfo = false;
   Rides? _rides;
   Users? _users;
   bool _isCarPoolingEnabled = false;
@@ -58,36 +60,28 @@ class RiderBookingViewModel extends ChangeNotifier {
 
   RiderBookingViewModel(
     this._context,
+    this._rideId,
     this._isSharingOn,
     this._tolerance,
     this._amountNeedToSave,
     this._pickupLatLng,
     this._destinationLatLng,
   ) {
-    _isCarPoolingEnabled = _isSharingOn;
-    _toleranceTimeController.text = (_tolerance / 60).toString();
-    _amountNeedToSaveController.text = _amountNeedToSave.toString();
-    _sourcePosition = Marker(
-      markerId: const MarkerId('source'),
-      position: _pickupLatLng,
-    );
-    _destinationPosition = Marker(
-      markerId: const MarkerId('destination'),
-      position: _destinationLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    );
-
     _getDataFromLocalDatabase();
     _getDataFromDatabase();
-    _getDistanceAndTimeBetweenSourceAndDestination();
-    _getPolylinesBetweenSourceAndDestination();
-    _getAddressFromPickUpMovement(_pickupLatLng).then((value) {
-      _pickupAddress = value;
-    });
-    _getAddressFromPickUpMovement(_destinationLatLng).then((value) {
-      _destinationAddress = value;
-    });
+    if (_rideId.isNotEmpty) {
+      _isLoadingRideInfo = true;
+      _showCarBookingLoadingView = true;
+      _getRideInfoFromRideId();
+    } else {
+      _isCarPoolingEnabled = _isSharingOn;
+      _toleranceTimeController.text = (_tolerance / 60).toString();
+      _amountNeedToSaveController.text = _amountNeedToSave.toString();
+      _initiateFunction();
+    }
   }
+
+  bool get isLoadingRideInfo => _isLoadingRideInfo;
 
   Completer<GoogleMapController?> get controller => _controller;
 
@@ -117,6 +111,26 @@ class RiderBookingViewModel extends ChangeNotifier {
   String get loadingViewText => _loadingViewText;
 
   List<double?> get loadingViewValues => _loadingViewValues;
+
+  void _initiateFunction() {
+    _sourcePosition = Marker(
+      markerId: const MarkerId('source'),
+      position: _pickupLatLng,
+    );
+    _destinationPosition = Marker(
+      markerId: const MarkerId('destination'),
+      position: _destinationLatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    );
+    _getDistanceAndTimeBetweenSourceAndDestination();
+    _getPolylinesBetweenSourceAndDestination();
+    _getAddressFromPickUpMovement(_pickupLatLng).then((value) {
+      _pickupAddress = value;
+    });
+    _getAddressFromPickUpMovement(_destinationLatLng).then((value) {
+      _destinationAddress = value;
+    });
+  }
 
   void _getDataFromLocalDatabase() async {
     await _riderBookingRepository
@@ -149,16 +163,27 @@ class RiderBookingViewModel extends ChangeNotifier {
     });
   }
 
+  void _getRideInfoFromRideId() async {
+    await _riderBookingRepository
+        .getRideInfoFromDatabase(_rideId)
+        .then((value) {
+      if (value.data != null) {
+        _rides = value.data as Rides;
+        _isLoadingRideInfo = false;
+        if (_rides?.driver != null) {
+          // todo check from merge ride id if exists
+          // todo sent to next screen with ride id and finish()
+        } else {
+          _createConnectionBetweenDatabase();
+        }
+      }
+    });
+  }
+
   void _getDistanceAndTimeBetweenSourceAndDestination() async {
     await getDistanceAndTimeBetweenSourceAndDestination(
-      LatLng(
-        _pickupLatLng.latitude,
-        _pickupLatLng.longitude,
-      ),
-      LatLng(
-        _destinationLatLng.latitude,
-        _destinationLatLng.longitude,
-      ),
+      _pickupLatLng,
+      _destinationLatLng,
     ).then((value) {
       _distanceBetweenSourceAndDestination = value[0];
       _timeTakenBetweenSourceAndDestination = value[1];
@@ -265,36 +290,40 @@ class RiderBookingViewModel extends ChangeNotifier {
         .then((value) async {
       if (value.data != null) {
         _rides?.rideId = value.data as String;
-        _loadingViewValues[0] = 1;
-        _loadingViewValues[1] = null;
-        _loadingViewText = 'Connecting with driver';
-        notifyListeners();
-        _riderBookingRepository.createContinuousConnectionBetweenDatabase(
-          (_rides?.rideId)!,
-          _streamController,
-        );
-        _streamSubscription = _streamController.stream.listen((value) async {
-          if (value.data != null) {
-            Rides rides1 = value.data as Rides;
-            if (rides1.approvedRide1At != 0) {
-              // todo sent to next screen with ride id and finish()
-            }
-            if (_loadingViewValues[0] == 1 && _loadingViewValues[2] == 0) {
-              _loadingViewValues[1] = 1;
-              _loadingViewText = 'Ride requested, locating your driver';
-              if (_isCarPoolingEnabled) {
-                _loadingViewValues[2] = null;
-                notifyListeners();
-                _sendRequestToSharedDriver(_rides!);
-              } else {
-                _loadingViewValues[2] = 1;
-                _loadingViewValues[3] = null;
-                notifyListeners();
-                _sendRequestToFreeDriver(_rides!);
-              }
-            }
+        _createConnectionBetweenDatabase();
+      }
+    });
+  }
+
+  void _createConnectionBetweenDatabase() {
+    _loadingViewValues[0] = 1;
+    _loadingViewValues[1] = null;
+    _loadingViewText = 'Connecting with driver';
+    notifyListeners();
+    _riderBookingRepository.createContinuousConnectionBetweenDatabase(
+      (_rides?.rideId)!,
+      _streamController,
+    );
+    _streamSubscription = _streamController.stream.listen((value) async {
+      if (value.data != null) {
+        Rides rides1 = value.data as Rides;
+        if (rides1.approvedRide1At != 0) {
+          // todo sent to next screen with ride id and finish()
+        }
+        if (_loadingViewValues[0] == 1 && _loadingViewValues[2] == 0) {
+          _loadingViewValues[1] = 1;
+          _loadingViewText = 'Ride requested, locating your driver';
+          if (_isCarPoolingEnabled) {
+            _loadingViewValues[2] = null;
+            notifyListeners();
+            _sendRequestToSharedDriver(_rides!);
+          } else {
+            _loadingViewValues[2] = 1;
+            _loadingViewValues[3] = null;
+            notifyListeners();
+            _sendRequestToFreeDriver(_rides!);
           }
-        });
+        }
       }
     });
   }
