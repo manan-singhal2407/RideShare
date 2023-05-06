@@ -16,7 +16,8 @@ class DriverEntity {
   late String status;
   late String carType;
   late String carNumber;
-  late double driverRating;
+  late int driverRating;
+  late int driverRatedRides;
   late int totalRides;
   late int totalFare;
   late int sharedRides;
@@ -43,6 +44,7 @@ class DriverEntity {
     this.carType,
     this.carNumber,
     this.driverRating,
+    this.driverRatedRides,
     this.totalRides,
     this.totalFare,
     this.sharedRides,

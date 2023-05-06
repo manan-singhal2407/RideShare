@@ -89,7 +89,7 @@ class _$LocalDatabase extends LocalDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `UsersEntity` (`createdAt` INTEGER NOT NULL, `emailId` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `userName` TEXT NOT NULL, `userUid` TEXT NOT NULL, `status` TEXT NOT NULL, `role` TEXT NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `totalAmountSaved` INTEGER NOT NULL, `tolerance` INTEGER NOT NULL, `amountNeedToSave` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`createdAt`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` REAL NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
+            'CREATE TABLE IF NOT EXISTS `DriverEntity` (`requestedAt` INTEGER NOT NULL, `approvedAt` INTEGER NOT NULL, `aadharImage` TEXT NOT NULL, `panImage` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `fullPhoneNumber` TEXT NOT NULL, `emailId` TEXT NOT NULL, `driverName` TEXT NOT NULL, `driverUid` TEXT NOT NULL, `status` TEXT NOT NULL, `carType` TEXT NOT NULL, `carNumber` TEXT NOT NULL, `driverRating` INTEGER NOT NULL, `driverRatedRides` INTEGER NOT NULL, `totalRides` INTEGER NOT NULL, `totalFare` INTEGER NOT NULL, `sharedRides` INTEGER NOT NULL, `isSharingOn` INTEGER NOT NULL, `isDrivingOn` INTEGER NOT NULL, `isSinglePersonInCar` INTEGER NOT NULL, `isDoublePersonInCar` INTEGER NOT NULL, `currentLatitude` REAL NOT NULL, `currentLongitude` REAL NOT NULL, `currentRideId` TEXT NOT NULL, PRIMARY KEY (`requestedAt`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -202,6 +202,7 @@ class _$DriverDao extends DriverDao {
                   'carType': item.carType,
                   'carNumber': item.carNumber,
                   'driverRating': item.driverRating,
+                  'driverRatedRides': item.driverRatedRides,
                   'totalRides': item.totalRides,
                   'totalFare': item.totalFare,
                   'sharedRides': item.sharedRides,
@@ -239,7 +240,8 @@ class _$DriverDao extends DriverDao {
             row['status'] as String,
             row['carType'] as String,
             row['carNumber'] as String,
-            row['driverRating'] as double,
+            row['driverRating'] as int,
+            row['driverRatedRides'] as int,
             row['totalRides'] as int,
             row['totalFare'] as int,
             row['sharedRides'] as int,

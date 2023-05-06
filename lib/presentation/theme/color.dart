@@ -12,6 +12,7 @@ const backgroundColor = Color(0xFFF2F2F2);
 const errorStateColor = Color(0xFFC61D24);
 const successStateColor = Color(0xFF219806);
 
+const skinnyHighlightColor = Color(0xFFFDE3E3);
 
 // Enable Ride Sharing
 // Allow other passengers to share your ride and split the fare with you

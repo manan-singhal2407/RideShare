@@ -92,7 +92,7 @@ class _RiderRidesViewLayoutState extends State<_RiderRidesViewLayout> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           color: Colors.white,
           child: GestureDetector(
-            // todo onTap show bottom sheet
+            onTap: widget.viewModel.showRideDetails,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

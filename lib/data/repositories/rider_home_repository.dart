@@ -81,6 +81,7 @@ class RiderHomeRepository implements IRiderHomeRepository {
           0,
           0,
           0,
+          0,
           true,
           true,
           false,

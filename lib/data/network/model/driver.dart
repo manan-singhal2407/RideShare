@@ -12,7 +12,8 @@ class Driver {
   late String status;
   late String carType;
   late String carNumber;
-  late double driverRating;
+  late num driverRating;
+  late num driverRatedRides;
   late num totalRides;
   late num totalFare;
   late num sharedRides;
@@ -39,6 +40,7 @@ class Driver {
     this.carType,
     this.carNumber,
     this.driverRating,
+    this.driverRatedRides,
     this.totalRides,
     this.totalFare,
     this.sharedRides,
@@ -66,6 +68,7 @@ class Driver {
     carType = map['carType'];
     carNumber = map['carNumber'];
     driverRating = map['driverRating'];
+    driverRatedRides = map['driverRatedRides'];
     totalRides = map['totalRides'];
     totalFare = map['totalFare'];
     sharedRides = map['sharedRides'];
@@ -94,6 +97,7 @@ class Driver {
       'carType': carType,
       'carNumber': carNumber,
       'driverRating': driverRating,
+      'driverRatedRides': driverRatedRides,
       'totalRides': totalRides,
       'totalFare': totalFare,
       'sharedRides': sharedRides,

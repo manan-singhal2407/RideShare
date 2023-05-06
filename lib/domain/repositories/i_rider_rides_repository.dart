@@ -7,4 +7,9 @@ abstract class IRiderRidesRepository {
     String rideId,
     StreamController<DataState> streamController,
   );
+
+  Future<DataState> updateRatingAndRemoveCurrentRideId(
+    String driverUid,
+    int rating,
+  );
 }

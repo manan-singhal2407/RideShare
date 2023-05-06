@@ -80,7 +80,6 @@ class RiderHomeViewModel extends ChangeNotifier {
         notifyListeners();
 
         if ((_users?.currentRideId)!.isNotEmpty) {
-          // todo redirect to rider booking page
           Navigator.pushNamed(
             _context,
             '/rider_booking_screen',

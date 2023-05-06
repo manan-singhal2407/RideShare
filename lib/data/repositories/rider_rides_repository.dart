@@ -7,6 +7,7 @@ import 'package:injectable/injectable.dart';
 import '../../domain/repositories/i_rider_rides_repository.dart';
 import '../../domain/state/data_state.dart';
 import '../../presentation/base/injectable.dart';
+import '../network/model/driver.dart';
 import '../network/model/rides.dart';
 
 @Injectable(as: IRiderRidesRepository)
@@ -32,5 +33,38 @@ class RiderRidesRepository implements IRiderRidesRepository {
         ]),
       );
     });
+  }
+
+  @override
+  Future<DataState> updateRatingAndRemoveCurrentRideId(
+    String driverUid,
+    int rating,
+  ) async {
+    bool onSuccess = false;
+    await _firebaseFirestore
+        .collection('Driver')
+        .doc(driverUid)
+        .get()
+        .then((value) async {
+      Driver driver = Driver.fromJson(value.data()!);
+      await _firebaseFirestore
+          .collection('Driver')
+          .doc(driverUid)
+          .update({'driverRating': driver.driverRating + rating, 'driverRatedRides': driver.driverRatedRides + 1})
+          .then((value) async {
+        await _firebaseFirestore
+            .collection('Users')
+            .doc(_firebaseAuth.currentUser?.uid)
+            .update({'currentRideId': ''})
+            .then((value) {
+          onSuccess = true;
+        });
+      });
+    });
+    if (onSuccess) {
+      return DataState.success(true);
+    } else {
+      return DataState.error(null, null);
+    }
   }
 }
