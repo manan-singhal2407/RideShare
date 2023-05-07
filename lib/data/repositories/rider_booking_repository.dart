@@ -68,7 +68,7 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .collection('Rides')
         .add(rides.toJson())
         .then((ridesReference) async {
-      String rideId = ridesReference.id;
+      rideId = ridesReference.id;
       await _firebaseFirestore
           .collection('Rides')
           .doc(rideId)
@@ -401,50 +401,52 @@ class RiderBookingRepository implements IRiderBookingRepository {
                         mergePath = '2143';
                       }
                     }
-                    await _firebaseFirestore
-                        .collection('Users')
-                        .doc(_firebaseAuth.currentUser?.uid)
-                        .collection('Request')
-                        .doc(ongoingRide.driver?.driverUid)
-                        .set({
-                      'driverUid': ongoingRide.driver?.driverUid,
-                      'type': 'sharing',
-                      'requestedAt': DateTime.now().millisecondsSinceEpoch,
-                    });
-                    await _firebaseFirestore
-                        .collection('Driver')
-                        .doc(ongoingRide.driver?.driverUid)
-                        .collection('Request')
-                        .doc(rides.rideId)
-                        .set({
-                      'request': rides.rideId,
-                      'type': 'sharing',
-                      'distance': minIndex == 0
-                          ? value7[0] ~/ 1000
-                          : minIndex == 1
-                              ? value4[0] ~/ 1000
-                              : minIndex == 2
-                                  ? value8[0] ~/ 1000
-                                  : value6[0] ~/ 1000,
-                      'requestedAt': DateTime.now().millisecondsSinceEpoch,
-                      'fareForUser1': minIndex == 0
-                          ? newFarePriceForUser1Case1
-                          : minIndex == 1
-                              ? newFarePriceForUser1Case2
-                              : minIndex == 2
-                                  ? newFarePriceForUser1Case3
-                                  : newFarePriceForUser1Case4,
-                      'fareForUser2': minIndex == 0
-                          ? newFarePriceForUser2Case1
-                          : minIndex == 1
-                              ? newFarePriceForUser2Case2
-                              : minIndex == 2
-                                  ? newFarePriceForUser2Case3
-                                  : newFarePriceForUser2Case4,
-                      'mergePath': mergePath,
-                    }).then((value) {
-                      onSuccess = true;
-                    });
+                    if (minIndex != -1) {
+                      await _firebaseFirestore
+                          .collection('Users')
+                          .doc(_firebaseAuth.currentUser?.uid)
+                          .collection('Request')
+                          .doc(ongoingRide.driver?.driverUid)
+                          .set({
+                        'driverUid': ongoingRide.driver?.driverUid,
+                        'type': 'sharing',
+                        'requestedAt': DateTime.now().millisecondsSinceEpoch,
+                      });
+                      await _firebaseFirestore
+                          .collection('Driver')
+                          .doc(ongoingRide.driver?.driverUid)
+                          .collection('Request')
+                          .doc(rides.rideId)
+                          .set({
+                        'request': rides.rideId,
+                        'type': 'sharing',
+                        'distance': minIndex == 0
+                            ? value7[0] ~/ 1000
+                            : minIndex == 1
+                            ? value4[0] ~/ 1000
+                            : minIndex == 2
+                            ? value8[0] ~/ 1000
+                            : value6[0] ~/ 1000,
+                        'requestedAt': DateTime.now().millisecondsSinceEpoch,
+                        'fareForUser1': minIndex == 0
+                            ? newFarePriceForUser1Case1
+                            : minIndex == 1
+                            ? newFarePriceForUser1Case2
+                            : minIndex == 2
+                            ? newFarePriceForUser1Case3
+                            : newFarePriceForUser1Case4,
+                        'fareForUser2': minIndex == 0
+                            ? newFarePriceForUser2Case1
+                            : minIndex == 1
+                            ? newFarePriceForUser2Case2
+                            : minIndex == 2
+                            ? newFarePriceForUser2Case3
+                            : newFarePriceForUser2Case4,
+                        'mergePath': mergePath,
+                      }).then((value) {
+                        onSuccess = true;
+                      });
+                    }
                   });
                 });
               });

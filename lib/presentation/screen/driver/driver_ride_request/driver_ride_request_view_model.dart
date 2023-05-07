@@ -18,7 +18,7 @@ class DriverRideRequestViewModel extends ChangeNotifier {
 
   final BuildContext _context;
 
-  late LatLng _driverLocation = const LatLng(30.7333, 76.7794);
+  late LatLng _driverLocation = defaultLatLng;
   Location location = Location();
   loc.LocationData? _currentPosition;
 
