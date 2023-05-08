@@ -26,9 +26,11 @@ Future<route.Route?> getRouteInWaypoints(
   route.GoogleMapsDirections directionsApi = route.GoogleMapsDirections(
     apiKey: googleMapsApiKey,
   );
-  route.DirectionsResponse response = await directionsApi.directionsWithLocation(
+  route.DirectionsResponse response =
+      await directionsApi.directionsWithLocation(
     route.Location(lat: pickupLatLng.latitude, lng: pickupLatLng.longitude),
-    route.Location(lat: destinationLatLng.latitude, lng: destinationLatLng.longitude),
+    route.Location(
+        lat: destinationLatLng.latitude, lng: destinationLatLng.longitude),
     travelMode: route.TravelMode.driving,
     departureTime: departureTime ?? 'now',
     waypoints: waypoints,
@@ -148,6 +150,18 @@ String getMToKmFormattedNumber(double value) {
 
 String getSecToTimeFormattedNumber(int seconds) {
   Duration duration = Duration(seconds: seconds);
+  int hours = duration.inHours;
+  int minutes = duration.inMinutes.remainder(60);
+  return hours == 0
+      ? '$minutes min'
+      : hours == 1
+          ? '1 hour $minutes min'
+          : '$hours hours $minutes min';
+}
+
+String getSecToPastTimeFormattedNumber(int time) {
+  Duration duration =
+      Duration(seconds: (DateTime.now().millisecondsSinceEpoch - time) ~/ 1000);
   int hours = duration.inHours;
   int minutes = duration.inMinutes.remainder(60);
   return hours == 0

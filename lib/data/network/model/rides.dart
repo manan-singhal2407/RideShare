@@ -45,6 +45,10 @@ class Rides {
   late bool isRideOver;
   late String mergeRideId;
   late String mergePath;
+  late int rateByUser1;
+  late int rateByUser2;
+  late String modeOfPaymentByUser1;
+  late String modeOfPaymentByUser2;
   late Users? user1;
   late Users? user2;
   late Driver? driver;
@@ -93,6 +97,10 @@ class Rides {
     this.isRideOver,
     this.mergeRideId,
     this.mergePath,
+    this.rateByUser1,
+    this.rateByUser2,
+    this.modeOfPaymentByUser1,
+    this.modeOfPaymentByUser2,
     this.user1,
     this.user2,
     this.driver,
@@ -142,6 +150,10 @@ class Rides {
     isRideOver = map['isRideOver'];
     mergeRideId = map['mergeRideId'];
     mergePath = map['mergePath'];
+    rateByUser1 = map['rateByUser1'];
+    rateByUser2 = map['rateByUser2'];
+    modeOfPaymentByUser1 = map['modeOfPaymentByUser1'];
+    modeOfPaymentByUser2 = map['modeOfPaymentByUser2'];
     user1 = Users.fromJson(map['User1'] as Map<String, dynamic>);
     user2 = map['User2'] != null
         ? Users.fromJson(map['User2'] as Map<String, dynamic>)
@@ -196,6 +208,10 @@ class Rides {
       'isRideOver': isRideOver,
       'mergeRideId': mergeRideId,
       'mergePath': mergePath,
+      'rateByUser1': rateByUser1,
+      'rateByUser2': rateByUser2,
+      'modeOfPaymentByUser1': modeOfPaymentByUser1,
+      'modeOfPaymentByUser2': modeOfPaymentByUser2,
       'User1': user1?.toJson(),
       'User2': user2?.toJson(),
       'Driver': driver?.toJson(),

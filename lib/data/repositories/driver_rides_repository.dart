@@ -127,6 +127,7 @@ class DriverRidesRepository implements IDriverRidesRepository {
                 'pickupUser2Latitude': ridesRequest.pickupUser1Latitude,
                 'pickupUser2Longitude': ridesRequest.pickupUser1Longitude,
                 'toleranceByUser2': ridesRequest.toleranceByUser1,
+                'modeOfPaymentByUser2': ridesRequest.modeOfPaymentByUser1,
               }).then((value) async {
                 await _firebaseFirestore
                     .collection('Users')

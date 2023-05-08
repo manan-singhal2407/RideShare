@@ -115,10 +115,12 @@ class _DriverHomePageState extends State<DriverHomePage> {
                         ListTile(
                           onTap: () {
                             _closeDrawer();
-                            showScaffoldMessenger(
+                            Navigator.pushNamed(
                               context,
-                              'My Rides',
-                              primaryTextColor,
+                              '/driver_my_rides_screen',
+                              arguments: DriverSettingsScreenArguments(
+                                viewModel.driverSharingOn,
+                              ),
                             );
                           },
                           leading: Container(

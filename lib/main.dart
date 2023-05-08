@@ -1,5 +1,6 @@
 import 'package:btp/presentation/base/injectable.dart';
 import 'package:btp/presentation/screen/driver/driver_home/driver_home_page.dart';
+import 'package:btp/presentation/screen/driver/driver_my_rides/driver_my_rides_page.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request/driver_ride_request_page.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/arguments/driver_ride_request_detail_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/driver_ride_request_detail_page.dart';
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
         '/rider_home_screen': (context) => const RiderHomePage(),
         '/driver_home_screen': (context) => const DriverHomePage(),
         '/driver_ride_request_screen': (context) => const DriverRideRequestPage(),
-        // '/driver_my_rides_screen': (context) => const DriverSettingsPage(),
+        '/driver_my_rides_screen': (context) => const DriverMyRidesPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/rider/search_screen') {
