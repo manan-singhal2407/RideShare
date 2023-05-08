@@ -9,6 +9,7 @@ import '../../../../data/cache/database/entities/driver_entity.dart';
 import '../../../../data/network/model/driver.dart';
 import '../../../../domain/repositories/i_driver_home_repository.dart';
 import '../../../base/injectable.dart';
+import '../../../extension/utils_extension.dart';
 import '../../../theme/widgets/loading.dart';
 import '../driver_rides/arguments/driver_rides_screen_arguments.dart';
 
@@ -20,7 +21,7 @@ class DriverHomeViewModel extends ChangeNotifier {
 
   final BuildContext _context;
 
-  late LatLng _driverLocation = const LatLng(30.7333, 76.7794);
+  late LatLng _driverLocation = defaultLatLng;
   Location location = Location();
   loc.LocationData? _currentPosition;
   final Completer<GoogleMapController?> _controller = Completer();
@@ -30,6 +31,7 @@ class DriverHomeViewModel extends ChangeNotifier {
   String _driverName = '';
   String _driverPhoneNumber = '';
   bool _driverOffline = true;
+  bool _driverSharingOn = true;
 
   late Timer _timer;
 
@@ -57,6 +59,8 @@ class DriverHomeViewModel extends ChangeNotifier {
 
   bool get driverOffline => _driverOffline;
 
+  bool get driverSharingOn => _driverSharingOn;
+
   void _getDataFromLocalDatabase() async {
     await _driverHomeRepository
         .getDriverDataFromLocalDatabase()
@@ -67,6 +71,7 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverName = driverEntity.driverName;
         _driverPhoneNumber = driverEntity.fullPhoneNumber;
         _driverOffline = !driverEntity.isDrivingOn;
+        _driverSharingOn = driverEntity.isSharingOn;
         // todo
         _driverLocation = LatLng(driverEntity.currentLatitude, driverEntity.currentLongitude);
         notifyListeners();
@@ -82,6 +87,7 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverName = driver.driverName;
         _driverPhoneNumber = driver.fullPhoneNumber;
         _driverOffline = !driver.isDrivingOn;
+        _driverSharingOn = driver.isSharingOn;
         notifyListeners();
 
         if (driver.currentRideId.isNotEmpty) {
@@ -90,7 +96,6 @@ class DriverHomeViewModel extends ChangeNotifier {
             '/driver_rides_screen',
             arguments: DriverRidesScreenArguments(
               driver.currentRideId,
-              null,
             ),
           );
         }

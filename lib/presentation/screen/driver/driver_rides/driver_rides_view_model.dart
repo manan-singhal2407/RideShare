@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:btp/domain/repositories/i_driver_rides_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:location/location.dart' as loc;
 
-import '../../../../data/cache/database/entities/driver_entity.dart';
-import '../../../../data/network/model/driver.dart';
 import '../../../../data/network/model/rides.dart';
-import '../../../../domain/repositories/i_driver_home_repository.dart';
+import '../../../../domain/enums/driver_shared_booking_enum.dart';
+import '../../../../domain/repositories/i_driver_rides_repository.dart';
+import '../../../../domain/state/data_state.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
+import '../../../theme/color.dart';
 import '../../../theme/widgets/loading.dart';
 
 class DriverRidesViewModel extends ChangeNotifier {
@@ -20,75 +19,304 @@ class DriverRidesViewModel extends ChangeNotifier {
       getIt<IDriverRidesRepository>();
 
   final BuildContext _context;
-  final String _currentRideId;
-  final Rides? _rides;
+  final String _rideId;
 
-  bool _isLoading = false;
-  late Rides _ridesInfo;
+  bool _isLoadingData = true;
+  late Rides _currentRideInfo;
 
-  late LatLng _driverLocation = const LatLng(30.7333, 76.7794);
+  StreamSubscription<DataState>? _streamSubscription;
+  final StreamController<DataState> _streamController =
+      StreamController<DataState>.broadcast();
+  List<List<Object>> _sharedRidesDataList = [];
+
   Location location = Location();
   loc.LocationData? _currentPosition;
   final Completer<GoogleMapController?> _controller = Completer();
+
   final Map<PolylineId, Polyline> _polylines = {};
-  final PolylinePoints _polylinePoints = PolylinePoints();
-  Marker? _sourcePosition, _destinationPosition;
+  LatLng _destinationPolylineLatLng = defaultLatLng;
+  final List<Marker> _screenMarker = [];
+  final List<Marker> _showScreenMarker = [];
+  late Timer _currentLocationTimer;
 
-  String _driverProfileUrl = '';
-  String _driverName = '';
-  String _driverPhoneNumber = '';
-  bool _driverOffline = true;
-
-  late Timer _timer;
-
-  DriverRidesViewModel(this._context, this._currentRideId, this._rides) {
-    if (_rides == null) {
-      _isLoading = true;
-      _getRidesInfoFromDatabase();
-    } else {
-      _ridesInfo = _rides!;
-      _getCurrentLocation();
-      _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-        _getCurrentLocation();
-      });
-    }
+  DriverRidesViewModel(this._context, this._rideId) {
+    _getRidesInfoFromDatabase();
   }
 
-  bool get isLoading => _isLoading;
+  bool get isLoadingData => _isLoadingData;
 
-  Rides get ridesInfo => _ridesInfo;
+  Rides get currentRideInfo => _currentRideInfo;
 
-  LatLng get driverLocation => _driverLocation;
-
-  Completer<GoogleMapController?> get controller => _controller;
+  List<List<Object>> get sharedRidesDataList => _sharedRidesDataList;
 
   Map<PolylineId, Polyline> get polylines => _polylines;
 
-  Marker? get sourcePosition => _sourcePosition;
+  List<Marker> get showScreenMarker => _showScreenMarker;
 
-  Marker? get destinationPosition => _destinationPosition;
-
-  String get driverProfileUrl => _driverProfileUrl;
-
-  String get driverName => _driverName;
-
-  String get driverPhoneNumber => _driverPhoneNumber;
-
-  bool get driverOffline => _driverOffline;
+  Completer<GoogleMapController?> get controller => _controller;
 
   void _getRidesInfoFromDatabase() async {
     await _driverRidesRepository
-        .getRidesInfoFromDatabase(_currentRideId)
-        .then((value) {
+        .getRidesInfoFromDatabase(_rideId)
+        .then((value) async {
       if (value.data != null) {
-        _isLoading = false;
-        _ridesInfo = value.data as Rides;
+        _isLoadingData = false;
+        _currentRideInfo = value.data as Rides;
+        _sharedRidesDataList.clear();
+
+        if (_currentRideInfo.isSharingOnByDriver) {
+          if (_currentRideInfo.user2 == null) {
+            _destinationPolylineLatLng = LatLng(
+              _currentRideInfo.destinationUser1Latitude,
+              _currentRideInfo.destinationUser1Longitude,
+            );
+            if (_currentRideInfo.reachedPickupUser1At == 0) {
+              _destinationPolylineLatLng = LatLng(
+                _currentRideInfo.pickupUser1Latitude,
+                _currentRideInfo.pickupUser1Longitude,
+              );
+              _screenMarker.add(Marker(
+                markerId: const MarkerId('source'),
+                position: LatLng(
+                  _currentRideInfo.pickupUser1Latitude,
+                  _currentRideInfo.pickupUser1Longitude,
+                ),
+                icon: BitmapDescriptor.fromBytes(
+                  await getUint8ListImages(
+                    'assets/images/ic_marker_pickup.png',
+                    100,
+                  ),
+                ),
+              ));
+            }
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('destination'),
+              position: LatLng(
+                _currentRideInfo.destinationUser1Latitude,
+                _currentRideInfo.destinationUser1Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_destination.png',
+                  100,
+                ),
+              ),
+            ));
+            _driverRidesRepository.createContinuousConnectionWithSharingRide(
+              _streamController,
+            );
+            _streamSubscription =
+                _streamController.stream.listen((value) async {
+              if (value.data != null) {
+                _sharedRidesDataList = value.data as List<List<Object>>;
+                notifyListeners();
+              }
+            });
+          } else {
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('source1'),
+              position: LatLng(
+                _currentRideInfo.pickupUser1Latitude,
+                _currentRideInfo.pickupUser1Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_position${_currentRideInfo.mergePath[0]}.png',
+                  100,
+                ),
+              ),
+            ));
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('source2'),
+              position: LatLng(
+                _currentRideInfo.pickupUser2Latitude,
+                _currentRideInfo.pickupUser2Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_position${_currentRideInfo.mergePath[1]}.png',
+                  100,
+                ),
+              ),
+            ));
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('destination1'),
+              position: LatLng(
+                _currentRideInfo.destinationUser1Latitude,
+                _currentRideInfo.destinationUser1Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_position${_currentRideInfo.mergePath[2]}.png',
+                  100,
+                ),
+              ),
+            ));
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('destination2'),
+              position: LatLng(
+                _currentRideInfo.destinationUser2Latitude,
+                _currentRideInfo.destinationUser2Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_position${_currentRideInfo.mergePath[3]}.png',
+                  100,
+                ),
+              ),
+            ));
+            if (_currentRideInfo.mergePath == '1234') {
+              if (_currentRideInfo.reachedPickupUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser1Latitude,
+                  _currentRideInfo.pickupUser1Longitude,
+                );
+              } else if (_currentRideInfo.reachedPickupUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser2Latitude,
+                  _currentRideInfo.pickupUser2Longitude,
+                );
+              } else if (_currentRideInfo.reachedDestinationUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser1Latitude,
+                  _currentRideInfo.destinationUser1Longitude,
+                );
+              } else {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser2Latitude,
+                  _currentRideInfo.destinationUser2Longitude,
+                );
+              }
+            } else if (_currentRideInfo.mergePath == '1243') {
+              if (_currentRideInfo.reachedPickupUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser1Latitude,
+                  _currentRideInfo.pickupUser1Longitude,
+                );
+              } else if (_currentRideInfo.reachedPickupUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser2Latitude,
+                  _currentRideInfo.pickupUser2Longitude,
+                );
+              } else if (_currentRideInfo.reachedDestinationUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser2Latitude,
+                  _currentRideInfo.destinationUser2Longitude,
+                );
+              } else {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser1Latitude,
+                  _currentRideInfo.destinationUser1Longitude,
+                );
+              }
+            } else if (_currentRideInfo.mergePath == '2134') {
+              if (_currentRideInfo.reachedPickupUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser2Latitude,
+                  _currentRideInfo.pickupUser2Longitude,
+                );
+              } else if (_currentRideInfo.reachedPickupUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser1Latitude,
+                  _currentRideInfo.pickupUser1Longitude,
+                );
+              } else if (_currentRideInfo.reachedDestinationUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser1Latitude,
+                  _currentRideInfo.destinationUser1Longitude,
+                );
+              } else {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser2Latitude,
+                  _currentRideInfo.destinationUser2Longitude,
+                );
+              }
+            } else if (_currentRideInfo.mergePath == '2143') {
+              if (_currentRideInfo.reachedPickupUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser2Latitude,
+                  _currentRideInfo.pickupUser2Longitude,
+                );
+              } else if (_currentRideInfo.reachedPickupUser1At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.pickupUser1Latitude,
+                  _currentRideInfo.pickupUser1Longitude,
+                );
+              } else if (_currentRideInfo.reachedDestinationUser2At == 0) {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser2Latitude,
+                  _currentRideInfo.destinationUser2Longitude,
+                );
+              } else {
+                _destinationPolylineLatLng = LatLng(
+                  _currentRideInfo.destinationUser1Latitude,
+                  _currentRideInfo.destinationUser1Longitude,
+                );
+              }
+            }
+            if (_currentRideInfo.mergePath.isNotEmpty) {
+              _showPolylineForDriver();
+            }
+          }
+        } else {
+          _destinationPolylineLatLng = LatLng(
+            _currentRideInfo.destinationUser1Latitude,
+            _currentRideInfo.destinationUser1Longitude,
+          );
+          if (_currentRideInfo.reachedPickupUser1At == 0) {
+            _destinationPolylineLatLng = LatLng(
+              _currentRideInfo.pickupUser1Latitude,
+              _currentRideInfo.pickupUser1Longitude,
+            );
+            _screenMarker.add(Marker(
+              markerId: const MarkerId('source'),
+              position: LatLng(
+                _currentRideInfo.pickupUser1Latitude,
+                _currentRideInfo.pickupUser1Longitude,
+              ),
+              icon: BitmapDescriptor.fromBytes(
+                await getUint8ListImages(
+                  'assets/images/ic_marker_pickup.png',
+                  100,
+                ),
+              ),
+            ));
+          }
+          _screenMarker.add(Marker(
+            markerId: const MarkerId('destination'),
+            position: LatLng(
+              _currentRideInfo.destinationUser1Latitude,
+              _currentRideInfo.destinationUser1Longitude,
+            ),
+            icon: BitmapDescriptor.fromBytes(
+              await getUint8ListImages(
+                'assets/images/ic_marker_destination.png',
+                100,
+              ),
+            ),
+          ));
+        }
+
+        notifyListeners();
         _getCurrentLocation();
-        _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        _currentLocationTimer =
+            Timer.periodic(const Duration(seconds: 10), (timer) {
           _getCurrentLocation();
         });
-        notifyListeners();
       }
+    });
+  }
+
+  void _showPolylineForDriver() async {
+    await getPolylineBetweenTwoPoints(
+      LatLng(
+        _currentRideInfo.driverLatitude,
+        _currentRideInfo.driverLongitude,
+      ),
+      _destinationPolylineLatLng,
+    ).then((value) async {
+      _polylines[value.polylineId] = value;
+      notifyListeners();
     });
   }
 
@@ -100,92 +328,111 @@ class DriverRidesViewModel extends ChangeNotifier {
       target: LatLng(_currentPosition!.latitude!, _currentPosition!.longitude!),
       zoom: 16,
     )));
-    _driverLocation = LatLng(
-      _currentPosition!.latitude!,
-      _currentPosition!.longitude!,
-    );
-    _sourcePosition = Marker(
-      markerId: const MarkerId('source'),
-      position: _driverLocation,
-    );
-    _destinationPosition = Marker(
-      markerId: const MarkerId('destination'),
+    _currentRideInfo.driverLatitude = _currentPosition!.latitude!;
+    _currentRideInfo.driverLongitude = _currentPosition!.longitude!;
+    _showScreenMarker.clear();
+    _showScreenMarker.addAll(_screenMarker);
+    _showScreenMarker.add(Marker(
+      markerId: const MarkerId('driver'),
       position: LatLng(
-        _ridesInfo.pickupUser1Latitude,
-        _ridesInfo.pickupUser1Longitude,
+        _currentRideInfo.driverLatitude,
+        _currentRideInfo.driverLongitude,
       ),
-    );
-    _getPolylinesBetweenSourceAndDestination();
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_driver.png',
+          100,
+        ),
+      ),
+    ));
+    _showPolylineForDriver();
   }
 
-  void _getPolylinesBetweenSourceAndDestination() async {
-    List<LatLng> polylineCoordinates = [];
-    List<dynamic> points = [];
-    PolylineResult result = await _polylinePoints.getRouteBetweenCoordinates(
-      googleMapsApiKey,
-      PointLatLng(_driverLocation.latitude, _driverLocation.longitude),
-      PointLatLng(_ridesInfo.pickupUser1Latitude, _ridesInfo.pickupUser1Longitude),
-      travelMode: TravelMode.driving,
-    );
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        points.add({'lat': point.latitude, 'lng': point.longitude});
+  void onSelectSharedRide(Rides requestRide) async {
+    showLoadingDialogBox(_context);
+    await _driverRidesRepository
+        .onSelectSharedRide(_currentRideInfo.rideId, requestRide.rideId,
+            (requestRide.user1?.userUid)!)
+        .then((value) {
+      Navigator.pop(_context);
+      DriverSharedBookingEnum status = value.data as DriverSharedBookingEnum;
+      if (status == DriverSharedBookingEnum.success) {
+        disposeScreen();
+        _getRidesInfoFromDatabase();
+      } else if (status == DriverSharedBookingEnum.error) {
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
+      } else if (status == DriverSharedBookingEnum.driverAccepted) {
+        showScaffoldMessenger(
+          _context,
+          'Ride already started',
+          errorStateColor,
+        );
+      } else if (status == DriverSharedBookingEnum.cancelledByUser) {
+        showScaffoldMessenger(
+          _context,
+          'Cancelled ride by user',
+          errorStateColor,
+        );
+      } else if (status == DriverSharedBookingEnum.alreadyMerged) {
+        showScaffoldMessenger(
+          _context,
+          'Already merged with other driver',
+          errorStateColor,
+        );
+      }
+    });
+  }
+
+  void onCancelSharedRide(Rides requestRide) async {
+    for (int i = 0; i < _sharedRidesDataList.length; i++) {
+      Rides rides = _sharedRidesDataList[i][0] as Rides;
+      if (rides.rideId == requestRide.rideId) {
+        _sharedRidesDataList.removeAt(i);
       }
     }
-
-    PolylineId id = const PolylineId('route');
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.blue.withOpacity(0.8),
-      points: polylineCoordinates,
-      width: 4,
-    );
-    _polylines[id] = polyline;
     notifyListeners();
-    _ridesInfo.driverLatitude = _driverLocation.latitude;
-    _ridesInfo.driverLongitude = _driverLocation.longitude;
-    // await _driverHomeRepository.updateDriverLocation(_driverLocation);
-  }
-
-  void onClickGoButton() async {
-    _driverOffline = false;
-    // _driverHomeRepository.setDriverOnline(true).then((value) {
-    //   if (value.data != null) {
-    //     notifyListeners();
-    //     onClickNextButton();
-    //   }
-    // });
-  }
-
-  void onClickNextButton() async {
-    Navigator.pushNamed(
-      _context,
-      '/driver_ride_request_screen',
+    await _driverRidesRepository.onCancelSharedRide(
+      requestRide.rideId,
+      (requestRide.user1?.userUid)!,
     );
   }
 
-  void onClickSetOfflineButton() async {
-    _driverOffline = true;
-    // _driverHomeRepository.setDriverOnline(false).then((value) {
-    //   if (value.data != null) {
-    //     notifyListeners();
-    //   }
-    // });
-  }
-
-  void logoutDriver() async {
+  void updateRidesInfo(String databaseKey, bool isRideOver) async {
     showLoadingDialogBox(_context);
-    // _driverHomeRepository.logoutUserFromDevice().then((value) {
-    //   Navigator.pushNamedAndRemoveUntil(
-    //     _context,
-    //     '/login_screen',
-    //     (r) => false,
-    //   );
-    // });
+    await _driverRidesRepository
+        .updateRideInfo(
+      _currentRideInfo.rideId,
+      {databaseKey: DateTime.now().millisecondsSinceEpoch},
+      currentRideInfo.fareReceivedByDriver == 0
+          ? currentRideInfo.initialFareReceivedByDriver.toInt()
+          : currentRideInfo.fareReceivedByDriver.toInt(),
+      isRideOver,
+      currentRideInfo.user2 != null,
+    )
+        .then((value) {
+      Navigator.pop(_context);
+      Navigator.pop(_context);
+      if (value.data != null) {
+        disposeScreen();
+        _getRidesInfoFromDatabase();
+        if (isRideOver) {
+          Navigator.pushNamedAndRemoveUntil(
+            _context,
+            '/driver_home_screen',
+                (r) => false,
+          );
+        }
+      }
+    });
   }
 
   void disposeScreen() async {
-    _timer.cancel();
+    _streamSubscription?.cancel();
+    _streamController.close();
+    _currentLocationTimer.cancel();
   }
 }

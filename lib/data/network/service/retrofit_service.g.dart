@@ -51,6 +51,39 @@ class _RestClient implements RestClient {
     return value;
   }
 
+  @override
+  Future<DirectionsResponse> getDirectionDataAfterSomeTime(
+    String origin,
+    String destination,
+    String googleMapsApiKey,
+    int departureTimeInSeconds,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'origin': origin,
+      r'destination': destination,
+      r'key': googleMapsApiKey,
+      r'departure_time': departureTimeInSeconds,
+    };
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<DirectionsResponse>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/directions/json',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = DirectionsResponse.fromJson(_result.data!);
+    return value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

@@ -86,7 +86,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             ),
           ));
           _screenMarker.add(Marker(
-            markerId: const MarkerId('destination1'),
+            markerId: const MarkerId('source2'),
             position: LatLng(
               (_rides?.pickupUser2Latitude)!,
               (_rides?.pickupUser2Longitude)!,
@@ -99,7 +99,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             ),
           ));
           _screenMarker.add(Marker(
-            markerId: const MarkerId('source2'),
+            markerId: const MarkerId('destination1'),
             position: LatLng(
               (_rides?.destinationUser1Latitude)!,
               (_rides?.destinationUser1Longitude)!,

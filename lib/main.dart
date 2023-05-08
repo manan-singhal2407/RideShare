@@ -5,6 +5,7 @@ import 'package:btp/presentation/screen/driver/driver_ride_request_detail/argume
 import 'package:btp/presentation/screen/driver/driver_ride_request_detail/driver_ride_request_detail_page.dart';
 import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_rides/driver_rides_page.dart';
+import 'package:btp/presentation/screen/driver/driver_settings/arguments/driver_settings_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
@@ -56,9 +57,8 @@ class MyApp extends StatelessWidget {
         '/login_screen': (context) => const LoginPage(),
         '/rider_home_screen': (context) => const RiderHomePage(),
         '/driver_home_screen': (context) => const DriverHomePage(),
-        '/driver_settings_screen': (context) => const DriverSettingsPage(),
         '/driver_ride_request_screen': (context) => const DriverRideRequestPage(),
-        '/driver_my_rides_screen': (context) => const DriverSettingsPage(),
+        // '/driver_my_rides_screen': (context) => const DriverSettingsPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/rider/search_screen') {
@@ -105,6 +105,15 @@ class MyApp extends StatelessWidget {
               );
             },
           );
+        } else if (settings.name == '/driver_settings_screen') {
+          final arguments = settings.arguments as DriverSettingsScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return DriverSettingsPage(
+                isSharingOn: arguments.isSharingOn,
+              );
+            },
+          );
         } else if (settings.name == '/driver_ride_request_detail_screen') {
           final arguments = settings.arguments as DriverRideRequestDetailScreenArguments;
           return MaterialPageRoute(
@@ -123,8 +132,7 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(
             builder: (context) {
               return DriverRidesPage(
-                currentRideId: arguments.currentRideId,
-                rides: arguments.rides,
+                rideId: arguments.rideId,
               );
             },
           );

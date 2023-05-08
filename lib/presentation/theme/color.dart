@@ -9,8 +9,8 @@ const shimmerHighlightColor = Color(0xFFDADADA);
 
 const backgroundColor = Color(0xFFF2F2F2);
 
-const errorStateColor = Color(0xFFC61D24);
 const successStateColor = Color(0xFF219806);
+const errorStateColor = Color(0xFFC61D24);
 
 const skinnyHighlightColor = Color(0xFFFDE3E3);
 

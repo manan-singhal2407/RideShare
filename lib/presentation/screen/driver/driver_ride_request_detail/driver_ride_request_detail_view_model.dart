@@ -85,8 +85,7 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
           '/driver_rides_screen',
           ModalRoute.withName('/driver_home_screen'),
           arguments: DriverRidesScreenArguments(
-            '',
-            value.data as Rides,
+            (value.data as Rides).rideId,
           ),
         );
       } else {

@@ -27,7 +27,7 @@ class _RiderSettingsPageState extends State<RiderSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<DriverSettingsViewModel>(
-      create: (context) => DriverSettingsViewModel(context),
+      create: (context) => DriverSettingsViewModel(context, true),
       child: Consumer<DriverSettingsViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(

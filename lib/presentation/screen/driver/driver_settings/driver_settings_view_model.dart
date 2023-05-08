@@ -11,10 +11,12 @@ class DriverSettingsViewModel extends ChangeNotifier {
       getIt<IDriverSettingsRepository>();
 
   final BuildContext _context;
+  final bool _isSharingOn;
 
   bool _isSharingOnByDriver = false;
 
-  DriverSettingsViewModel(this._context) {
+  DriverSettingsViewModel(this._context, this._isSharingOn) {
+    _isSharingOnByDriver = _isSharingOn;
     _getDataFromLocalDatabase();
     _getDataFromDatabase();
   }

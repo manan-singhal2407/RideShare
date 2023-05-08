@@ -14,4 +14,12 @@ abstract class RestClient {
     @Query('destination') String destination,
     @Query('key') String googleMapsApiKey,
   );
+
+  @GET('/directions/json')
+  Future<DirectionsResponse> getDirectionDataAfterSomeTime(
+    @Query('origin') String origin,
+    @Query('destination') String destination,
+    @Query('key') String googleMapsApiKey,
+    @Query('departure_time') int departureTimeInSeconds,
+  );
 }

@@ -1,4 +1,5 @@
 import 'package:btp/presentation/extension/utils_extension.dart';
+import 'package:btp/presentation/screen/driver/driver_settings/arguments/driver_settings_screen_arguments.dart';
 import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -152,6 +153,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             Navigator.pushNamed(
                               context,
                               '/driver_settings_screen',
+                              arguments: DriverSettingsScreenArguments(
+                                viewModel.driverSharingOn,
+                              ),
                             );
                           },
                           leading: Container(

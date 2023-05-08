@@ -36,7 +36,7 @@ class PrimaryAppButton extends StatelessWidget {
           style: GoogleFonts.openSans(
             textStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: primaryTextColor,
+              color: Colors.white,
             ),
           ),
         ),

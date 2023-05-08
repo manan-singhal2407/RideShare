@@ -1,14 +1,19 @@
-import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_view_model.dart';
-import 'package:btp/presentation/theme/color.dart';
-import 'package:btp/presentation/theme/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../theme/color.dart';
 import '../../../theme/widgets/app_bar.dart';
+import '../../../theme/widgets/app_button.dart';
+import 'driver_settings_view_model.dart';
 
 class DriverSettingsPage extends StatefulWidget {
-  const DriverSettingsPage({super.key});
+  final bool isSharingOn;
+
+  const DriverSettingsPage({
+    super.key,
+    required this.isSharingOn,
+  });
 
   @override
   State<DriverSettingsPage> createState() => _DriverSettingsPageState();
@@ -18,7 +23,7 @@ class _DriverSettingsPageState extends State<DriverSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<DriverSettingsViewModel>(
-      create: (context) => DriverSettingsViewModel(context),
+      create: (context) => DriverSettingsViewModel(context, widget.isSharingOn),
       child: Consumer<DriverSettingsViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(

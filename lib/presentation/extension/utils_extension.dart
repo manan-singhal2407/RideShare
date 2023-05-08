@@ -78,7 +78,7 @@ Future<Polyline> getPolylineBetweenTwoPoints(
   PolylineId id = const PolylineId('route');
   Polyline polyline = Polyline(
     polylineId: id,
-    color: Colors.blue.withOpacity(0.8),
+    color: Colors.black54.withOpacity(0.7),
     points: polylineCoordinates,
     width: 4,
   );
