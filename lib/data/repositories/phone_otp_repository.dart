@@ -42,18 +42,26 @@ class PhoneOtpRepository implements IPhoneOtpRepository {
   }
 
   @override
-  Future<void> checkForOtpVerification(
+  Future<DataState> checkForOtpVerification(
     String verificationId,
     String otp,
-    ValueSetter<UserCredential> onVerificationCompleted,
   ) async {
+    bool onSuccess = false;
+    String error = '';
     PhoneAuthCredential authCredential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: otp,
     );
-    await _firebaseAuth
-        .signInWithCredential(authCredential)
-        .then(onVerificationCompleted);
+    await _firebaseAuth.signInWithCredential(authCredential).then((value) {
+      onSuccess = true;
+    }).onError((e, stackTrace) {
+      error = e.toString();
+    });
+    if (onSuccess) {
+      return DataState.success(true);
+    } else {
+      return DataState.error(error, null);
+    }
   }
 
   @override
@@ -73,7 +81,8 @@ class PhoneOtpRepository implements IPhoneOtpRepository {
             .get()
             .then((value) async {
           Driver driver = Driver.fromJson(value.data()!);
-          await _driverDao.insertDriverEntity(convertDriverToDriverEntity(driver));
+          await _driverDao
+              .insertDriverEntity(convertDriverToDriverEntity(driver));
           onSuccess = true;
         });
       } else {

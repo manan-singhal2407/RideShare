@@ -122,6 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
+                              maxLength: 10,
                             ),
                             const SizedBox(
                               height: 20,

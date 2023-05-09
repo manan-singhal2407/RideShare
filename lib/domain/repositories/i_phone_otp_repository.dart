@@ -12,13 +12,12 @@ abstract class IPhoneOtpRepository {
     ValueSetter<String> onCodeSent,
   );
 
-  Future<void> checkForOtpVerification(
+  Future<DataState> checkForOtpVerification(
     String verificationId,
     String otp,
-    ValueSetter<UserCredential> onVerificationCompleted,
   );
 
-  Future<void> settingUpLoginAccount(bool updateDriverDao);
+  Future<DataState> settingUpLoginAccount(bool updateDriverDao);
 
-  Future<void> settingUpNewAccount(Users users);
+  Future<DataState> settingUpNewAccount(Users users);
 }

@@ -6,6 +6,7 @@ import '../../../domain/repositories/i_login_repository.dart';
 import '../../base/injectable.dart';
 import '../../extension/utils_extension.dart';
 import '../../theme/color.dart';
+import '../../theme/widgets/loading.dart';
 import '../phone_otp/arguments/phone_otp_screen_arguments.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -45,10 +46,12 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     if (!_showInvalidNameMessage && !_showInvalidPhoneNumber) {
+      showLoadingDialogBox(_context);
       String phone = '$_countryCode ${_phoneNumberController.text.trim()}';
       await _loginRepository
           .checkIfPhoneNumberAccountExists(phone)
           .then((value) {
+        Navigator.pop(_context);
         if (value.data != null) {
           Navigator.pushNamed(
             _context,
@@ -71,6 +74,7 @@ class LoginViewModel extends ChangeNotifier {
           );
         }
       }).onError((error, stackTrace) {
+        Navigator.pop(_context);
         showScaffoldMessenger(
           _context,
           'Something Went Wrong',

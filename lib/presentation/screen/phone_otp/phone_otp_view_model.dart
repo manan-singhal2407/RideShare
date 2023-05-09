@@ -7,6 +7,7 @@ import '../../../domain/repositories/i_phone_otp_repository.dart';
 import '../../base/injectable.dart';
 import '../../extension/utils_extension.dart';
 import '../../theme/color.dart';
+import '../../theme/widgets/loading.dart';
 
 class PhoneOtpViewModel extends ChangeNotifier {
   final IPhoneOtpRepository _phoneOtpRepository = getIt<IPhoneOtpRepository>();
@@ -57,10 +58,11 @@ class PhoneOtpViewModel extends ChangeNotifier {
         _loginSuccessful();
       },
       (value) {
+        Navigator.pop(_context);
         if (value.code == 'invalid-phone-number') {
           showScaffoldMessenger(
             _context,
-            'Invalid Mobile Number',
+            'Invalid Phone Number',
             errorStateColor,
           );
         } else {
@@ -78,13 +80,31 @@ class PhoneOtpViewModel extends ChangeNotifier {
   }
 
   void onNextButtonClick() async {
-    await _phoneOtpRepository.checkForOtpVerification(
+    showLoadingDialogBox(_context);
+    await _phoneOtpRepository
+        .checkForOtpVerification(
       _verificationId,
       '${_otpController1.text.trim()}${_otpController2.text.trim()}${_otpController3.text.trim()}${_otpController4.text.trim()}${_otpController5.text.trim()}${_otpController6.text.trim()}',
-      (value) {
+    )
+        .then((value) {
+      if (value.data != null) {
         _loginSuccessful();
-      },
-    );
+      } else {
+        Navigator.pop(_context);
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
+      }
+    }).onError((error, stackTrace) {
+      Navigator.pop(_context);
+      showScaffoldMessenger(
+        _context,
+        'Something went wrong',
+        errorStateColor,
+      );
+    });
   }
 
   void _loginSuccessful() {
@@ -99,7 +119,23 @@ class PhoneOtpViewModel extends ChangeNotifier {
     await _phoneOtpRepository
         .settingUpLoginAccount(_accountTypeEnum == AccountTypeEnum.driver)
         .then((value) {
-      openHomeScreenAndClearStack(_context, _accountTypeEnum);
+      Navigator.pop(_context);
+      if (value.data != null) {
+        openHomeScreenAndClearStack(_context, _accountTypeEnum);
+      } else {
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
+      }
+    }).onError((error, stackTrace) {
+      Navigator.pop(_context);
+      showScaffoldMessenger(
+        _context,
+        'Something went wrong',
+        errorStateColor,
+      );
     });
   }
 
@@ -124,7 +160,23 @@ class PhoneOtpViewModel extends ChangeNotifier {
       '',
     );
     await _phoneOtpRepository.settingUpNewAccount(users).then((value) {
-      openHomeScreenAndClearStack(_context, _accountTypeEnum);
+      Navigator.pop(_context);
+      if (value.data != null) {
+        openHomeScreenAndClearStack(_context, _accountTypeEnum);
+      } else {
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
+      }
+    }).onError((error, stackTrace) {
+      Navigator.pop(_context);
+      showScaffoldMessenger(
+        _context,
+        'Something went wrong',
+        errorStateColor,
+      );
     });
   }
 }

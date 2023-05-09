@@ -112,46 +112,56 @@ class _PhoneOtpPageState extends State<PhoneOtpPage> {
                               children: [
                                 OtpTextField(
                                   textEditingController:
-                                  viewModel.otpController1,
+                                      viewModel.otpController1,
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).nextFocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).unfocus();
                                     }
                                   },
                                 ),
                                 OtpTextField(
                                   textEditingController:
-                                  viewModel.otpController2,
+                                      viewModel.otpController2,
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).nextFocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
                                 OtpTextField(
                                   textEditingController:
-                                  viewModel.otpController3,
+                                      viewModel.otpController3,
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).nextFocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
                                 OtpTextField(
                                   textEditingController:
-                                  viewModel.otpController4,
+                                      viewModel.otpController4,
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).nextFocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
                                 OtpTextField(
                                   textEditingController:
-                                  viewModel.otpController5,
+                                      viewModel.otpController5,
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).nextFocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
@@ -161,6 +171,8 @@ class _PhoneOtpPageState extends State<PhoneOtpPage> {
                                   onChangedText: (value) {
                                     if (value.length == 1) {
                                       FocusScope.of(context).unfocus();
+                                    } else if (value.isEmpty) {
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
