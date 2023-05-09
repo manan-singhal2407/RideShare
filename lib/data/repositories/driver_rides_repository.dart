@@ -31,7 +31,7 @@ class DriverRidesRepository implements IDriverRidesRepository {
         .then((value) async {
       rides = Rides.fromJson(value.data()!);
     });
-    return DataState.success(rides);
+    return DataState.success([rides, _firebaseAuth.currentUser?.uid]);
   }
 
   @override

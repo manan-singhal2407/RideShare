@@ -38,10 +38,9 @@ class DriverHomeViewModel extends ChangeNotifier {
   DriverHomeViewModel(this._context) {
     _getDataFromLocalDatabase();
     _getDataFromDatabase(false);
-    // todo
-    // _getCurrentLocation();
+    _getCurrentLocation();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      // _getCurrentLocation();
+      _getCurrentLocation();
     });
   }
 
@@ -72,8 +71,6 @@ class DriverHomeViewModel extends ChangeNotifier {
         _driverPhoneNumber = driverEntity.fullPhoneNumber;
         _driverOffline = !driverEntity.isDrivingOn;
         _driverSharingOn = driverEntity.isSharingOn;
-        // todo
-        _driverLocation = LatLng(driverEntity.currentLatitude, driverEntity.currentLongitude);
         notifyListeners();
       }
     });
@@ -124,12 +121,17 @@ class DriverHomeViewModel extends ChangeNotifier {
       _currentPosition!.longitude!,
     );
     _sourcePosition = Marker(
-      markerId: const MarkerId('source'),
+      markerId: const MarkerId('driver'),
       position: _driverLocation,
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_driver.png',
+          100,
+        ),
+      ),
     );
     notifyListeners();
-    // todo
-    // await _driverHomeRepository.updateDriverLocation(_driverLocation);
+    await _driverHomeRepository.updateDriverLocation(_driverLocation);
   }
 
   void onClickGoButton() async {

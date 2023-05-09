@@ -61,7 +61,15 @@ class DriverRidesViewModel extends ChangeNotifier {
         .then((value) async {
       if (value.data != null) {
         _isLoadingData = false;
-        _currentRideInfo = value.data as Rides;
+        _currentRideInfo = value.data[0] as Rides;
+        if (_currentRideInfo.driver?.driverUid != value.data[1]) {
+          showScaffoldMessenger(
+            _context,
+            'Something went wrong',
+            errorStateColor,
+          );
+          Navigator.pop(_context);
+        }
         _sharedRidesDataList.clear();
 
         if (_currentRideInfo.isSharingOnByDriver) {
@@ -84,7 +92,7 @@ class DriverRidesViewModel extends ChangeNotifier {
                 icon: BitmapDescriptor.fromBytes(
                   await getUint8ListImages(
                     'assets/images/ic_marker_pickup.png',
-                    100,
+                    50,
                   ),
                 ),
               ));
@@ -98,7 +106,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_destination.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -122,7 +130,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_position${_currentRideInfo.mergePath[0]}.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -135,7 +143,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_position${_currentRideInfo.mergePath[1]}.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -148,7 +156,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_position${_currentRideInfo.mergePath[2]}.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -161,7 +169,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_position${_currentRideInfo.mergePath[3]}.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -277,7 +285,7 @@ class DriverRidesViewModel extends ChangeNotifier {
               icon: BitmapDescriptor.fromBytes(
                 await getUint8ListImages(
                   'assets/images/ic_marker_pickup.png',
-                  100,
+                  50,
                 ),
               ),
             ));
@@ -291,7 +299,7 @@ class DriverRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_destination.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -423,7 +431,7 @@ class DriverRidesViewModel extends ChangeNotifier {
           Navigator.pushNamedAndRemoveUntil(
             _context,
             '/driver_home_screen',
-                (r) => false,
+            (r) => false,
           );
         }
       }

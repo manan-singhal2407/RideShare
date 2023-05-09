@@ -64,7 +64,7 @@ class RiderRidesViewModel extends ChangeNotifier {
           ),
           icon: BitmapDescriptor.fromBytes(
             await getUint8ListImages(
-              'assets/images/swift.png',
+              'assets/images/ic_marker_driver.png',
               100,
             ),
           ),
@@ -175,7 +175,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             ),
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
-                'assets/images/pick.png',
+                'assets/images/ic_marker_pickup.png',
                 100,
               ),
             ),
@@ -188,7 +188,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             ),
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
-                'assets/images/pick.png',
+                'assets/images/ic_marker_destination.png',
                 100,
               ),
             ),

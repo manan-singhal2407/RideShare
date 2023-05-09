@@ -47,25 +47,25 @@ class DriverHomeRepository implements IDriverHomeRepository {
   @override
   Future<DataState> updateDriverLocation(LatLng latLng) async {
     bool onSuccess = false;
-    if (_firebaseAuth.currentUser != null) {
+    await _firebaseFirestore
+        .collection('Driver')
+        .doc(_firebaseAuth.currentUser?.uid)
+        .update({
+      'currentLatitude': latLng.latitude,
+      'currentLongitude': latLng.longitude
+    }).then((value) async {
       await _firebaseFirestore
           .collection('Driver')
           .doc(_firebaseAuth.currentUser?.uid)
-          .update({
-        'currentLatitude': latLng.latitude,
-        'currentLongitude': latLng.longitude
-      }).then((value) async {
-        await _driverDao.getDriverEntityInfo().then((value) async {
-          if (value.isNotEmpty) {
-            DriverEntity driverEntity = value[0];
-            driverEntity.currentLatitude = latLng.latitude;
-            driverEntity.currentLongitude = latLng.longitude;
-            await _driverDao.insertDriverEntity(driverEntity);
-            onSuccess = true;
-          }
-        });
+          .get()
+          .then((value) async {
+        Driver driver = Driver.fromJson(value.data()!);
+        await _driverDao.insertDriverEntity(
+          convertDriverToDriverEntity(driver),
+        );
+        onSuccess = true;
       });
-    }
+    });
     if (onSuccess) {
       return DataState.success(true);
     } else {

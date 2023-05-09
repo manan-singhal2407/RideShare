@@ -4,6 +4,7 @@ import 'package:btp/domain/enums/account_type_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geocoder2/geocoder2.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart' as route;
@@ -89,6 +90,15 @@ Future<Polyline> getPolylineBetweenTwoPoints(
   return polyline;
 }
 
+Future<String> getAddressFromLatLng(LatLng latLng) async {
+  GeoData data = await Geocoder2.getDataFromCoordinates(
+    latitude: latLng.latitude,
+    longitude: latLng.longitude,
+    googleMapApiKey: googleMapsApiKey,
+  );
+  return data.address;
+}
+
 Future<Uint8List> getUint8ListImages(String path, int width) async {
   ByteData data = await rootBundle.load(path);
   ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
@@ -126,9 +136,11 @@ void openHomeScreenAndClearStack(
   AccountTypeEnum accountTypeEnum,
 ) {
   if (accountTypeEnum == AccountTypeEnum.driver) {
-    Navigator.pushNamedAndRemoveUntil(context, '/driver_home_screen', (r) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/driver_home_screen', (r) => false);
   } else if (accountTypeEnum == AccountTypeEnum.user) {
-    Navigator.pushNamedAndRemoveUntil(context, '/rider_home_screen', (r) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/rider_home_screen', (r) => false);
   }
 }
 

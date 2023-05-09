@@ -1,10 +1,6 @@
 import 'dart:async';
 
-import 'package:btp/presentation/screen/rider/rider_rides/arguments/rider_rides_screen_arguments.dart';
-import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../data/cache/database/entities/users_entity.dart';
@@ -16,6 +12,8 @@ import '../../../../domain/state/data_state.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
 import '../../../theme/color.dart';
+import '../../../theme/widgets/loading.dart';
+import '../rider_rides/arguments/rider_rides_screen_arguments.dart';
 
 class RiderBookingViewModel extends ChangeNotifier {
   final IRiderBookingRepository _riderBookingRepository =
@@ -23,15 +21,14 @@ class RiderBookingViewModel extends ChangeNotifier {
 
   final BuildContext _context;
   final String _rideId;
-  final bool _isSharingOn;
-  final int _tolerance;
-  final int _amountNeedToSave;
-  final LatLng _pickupLatLng;
-  final LatLng _destinationLatLng;
+  bool _isSharingOn;
+  int _tolerance;
+  int _amountNeedToSave;
+  LatLng _pickupLatLng;
+  LatLng _destinationLatLng;
 
   final Completer<GoogleMapController?> _controller = Completer();
   final Map<PolylineId, Polyline> _polylines = {};
-  final PolylinePoints _polylinePoints = PolylinePoints();
   Marker? _sourcePosition, _destinationPosition;
 
   double _distanceBetweenSourceAndDestination = -100;
@@ -114,22 +111,68 @@ class RiderBookingViewModel extends ChangeNotifier {
 
   List<double?> get loadingViewValues => _loadingViewValues;
 
-  void _initiateFunction() {
+  void _getRideInfoFromRideId() async {
+    await _riderBookingRepository
+        .getRideInfoFromDatabase(_rideId)
+        .then((value) {
+      if (value.data != null) {
+        Rides rides = value.data as Rides;
+        _rides = rides;
+        _isLoadingRideInfo = false;
+        if (rides.driver != null) {
+          Navigator.pushReplacementNamed(
+            _context,
+            '/rider_rides_screen',
+            arguments: RiderRidesScreenArguments(
+              rides.mergeWithOtherRequest ? rides.mergeRideId : rides.rideId,
+            ),
+          );
+        } else {
+          _pickupLatLng = LatLng(
+            rides.pickupUser1Latitude,
+            rides.pickupUser1Longitude,
+          );
+          _destinationLatLng = LatLng(
+            rides.destinationUser1Latitude,
+            rides.destinationUser1Longitude,
+          );
+          _isSharingOn = rides.isSharingOnByUser1;
+          _tolerance = rides.toleranceByUser1.toInt();
+          _amountNeedToSave = rides.amountNeedToSaveForUser1.toInt();
+          _initiateFunction();
+          _createConnectionBetweenDatabase();
+        }
+      }
+    });
+  }
+
+  void _initiateFunction() async {
     _sourcePosition = Marker(
       markerId: const MarkerId('source'),
       position: _pickupLatLng,
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_pickup.png',
+          100,
+        ),
+      ),
     );
     _destinationPosition = Marker(
       markerId: const MarkerId('destination'),
       position: _destinationLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_destination.png',
+          100,
+        ),
+      ),
     );
     _getDistanceAndTimeBetweenSourceAndDestination();
     _getPolylinesBetweenSourceAndDestination();
-    _getAddressFromPickUpMovement(_pickupLatLng).then((value) {
+    await getAddressFromLatLng(_pickupLatLng).then((value) {
       _pickupAddress = value;
     });
-    _getAddressFromPickUpMovement(_destinationLatLng).then((value) {
+    await getAddressFromLatLng(_destinationLatLng).then((value) {
       _destinationAddress = value;
     });
   }
@@ -165,28 +208,6 @@ class RiderBookingViewModel extends ChangeNotifier {
     });
   }
 
-  void _getRideInfoFromRideId() async {
-    await _riderBookingRepository
-        .getRideInfoFromDatabase(_rideId)
-        .then((value) {
-      if (value.data != null) {
-        _rides = value.data as Rides;
-        _isLoadingRideInfo = false;
-        if (_rides?.driver != null) {
-          Navigator.pushReplacementNamed(
-            _context,
-            '/rider_rides_screen',
-            arguments: RiderRidesScreenArguments(
-              (_rides?.mergeWithOtherRequest)! ? (_rides?.mergeRideId)! : (_rides?.rideId)!,
-            ),
-          );
-        } else {
-          _createConnectionBetweenDatabase();
-        }
-      }
-    });
-  }
-
   void _getDistanceAndTimeBetweenSourceAndDestination() async {
     await getDistanceAndTimeBetweenSourceAndDestination(
       _pickupLatLng,
@@ -199,39 +220,13 @@ class RiderBookingViewModel extends ChangeNotifier {
   }
 
   void _getPolylinesBetweenSourceAndDestination() async {
-    List<LatLng> polylineCoordinates = [];
-    List<dynamic> points = [];
-    PolylineResult result = await _polylinePoints.getRouteBetweenCoordinates(
-      googleMapsApiKey,
-      PointLatLng(_pickupLatLng.latitude, _pickupLatLng.longitude),
-      PointLatLng(_destinationLatLng.latitude, _destinationLatLng.longitude),
-      travelMode: TravelMode.driving,
-    );
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        points.add({'lat': point.latitude, 'lng': point.longitude});
-      }
-    }
-
-    PolylineId id = const PolylineId('route');
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.blue.withOpacity(0.8),
-      points: polylineCoordinates,
-      width: 4,
-    );
-    _polylines[id] = polyline;
-    notifyListeners();
-  }
-
-  Future<String> _getAddressFromPickUpMovement(LatLng latLng) async {
-    GeoData data = await Geocoder2.getDataFromCoordinates(
-      latitude: latLng.latitude,
-      longitude: latLng.longitude,
-      googleMapApiKey: googleMapsApiKey,
-    );
-    return data.address;
+    await getPolylineBetweenTwoPoints(
+      _pickupLatLng,
+      _destinationLatLng,
+    ).then((value) {
+      _polylines[value.polylineId] = value;
+      notifyListeners();
+    });
   }
 
   void onCarPoolingClicked() async {
@@ -252,7 +247,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       0,
       0,
       0,
-      _distanceBetweenSourceAndDestination / 50 + 15,
+      (_distanceBetweenSourceAndDestination / 50) + 15,
       0,
       _distanceBetweenSourceAndDestination / 50,
       0,
@@ -318,7 +313,7 @@ class RiderBookingViewModel extends ChangeNotifier {
     _streamSubscription = _streamController.stream.listen((value) async {
       if (value.data != null) {
         Rides rides1 = value.data as Rides;
-        if (rides1.approvedRide1At != 0) {
+        if (rides1.approvedRide1At != 0 || rides1.mergeRideId.isNotEmpty) {
           Navigator.pushReplacementNamed(
             _context,
             '/rider_rides_screen',
@@ -349,7 +344,7 @@ class RiderBookingViewModel extends ChangeNotifier {
     await _riderBookingRepository
         .sendRideRequestForSharedDriver(rides)
         .then((value) async {
-      _delayedFreeDriverCall = Timer(const Duration(seconds: 30), () {
+      _delayedFreeDriverCall = Timer(const Duration(seconds: 5), () {
         _loadingViewValues[2] = 1;
         _loadingViewValues[3] = null;
         notifyListeners();
@@ -363,14 +358,27 @@ class RiderBookingViewModel extends ChangeNotifier {
         .sendRideRequestForFreeDriver(rides)
         .then((value) async {
       if (value.data != null) {
-        _delayedCancelButtonOption = Timer(const Duration(seconds: 30), () {
+        _delayedCancelButtonOption = Timer(const Duration(seconds: 5), () {
           _showCarBookingCancelButton = true;
           notifyListeners();
         });
       } else {
         _showCarBookingCancelButton = true;
         notifyListeners();
+        showScaffoldMessenger(
+          _context,
+          'Something went wrong',
+          errorStateColor,
+        );
       }
+    }).onError((error, stackTrace) {
+      _showCarBookingCancelButton = true;
+      notifyListeners();
+      showScaffoldMessenger(
+        _context,
+        'Something went wrong',
+        errorStateColor,
+      );
     });
   }
 
@@ -403,6 +411,12 @@ class RiderBookingViewModel extends ChangeNotifier {
           errorStateColor,
         );
       }
+    }).onError((error, stackTrace) {
+      showScaffoldMessenger(
+        _context,
+        'Something went wrong',
+        errorStateColor,
+      );
     });
   }
 

@@ -53,7 +53,6 @@ class DriverRideRequestViewModel extends ChangeNotifier {
       _currentPosition!.latitude!,
       _currentPosition!.longitude!,
     );
-    notifyListeners();
   }
 
   void _getRideRequestFromDatabase() async {
@@ -62,6 +61,10 @@ class DriverRideRequestViewModel extends ChangeNotifier {
       if (value.data != null) {
         _ridesList = value.data;
         _ridesRequestData.clear();
+        if (_ridesList.isEmpty) {
+          _isLoading = false;
+          notifyListeners();
+        }
         for (int i = 0; i < _ridesList.length; i++) {
           await getDistanceAndTimeBetweenSourceAndDestination(
             _driverLocation,

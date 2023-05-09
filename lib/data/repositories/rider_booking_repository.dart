@@ -126,6 +126,9 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .get()
         .then((value) async {
       List<Rides> ridesList = [];
+      if (value.docs.isEmpty) {
+        onSuccess = true;
+      }
       for (int i = 0; i < value.docs.length; i++) {
         Rides rides1 = Rides.fromJson(value.docs[i].data());
         ridesList.add(rides1);
@@ -423,29 +426,31 @@ class RiderBookingRepository implements IRiderBookingRepository {
                         'distance': minIndex == 0
                             ? value7[0] ~/ 1000
                             : minIndex == 1
-                            ? value4[0] ~/ 1000
-                            : minIndex == 2
-                            ? value8[0] ~/ 1000
-                            : value6[0] ~/ 1000,
+                                ? value4[0] ~/ 1000
+                                : minIndex == 2
+                                    ? value8[0] ~/ 1000
+                                    : value6[0] ~/ 1000,
                         'requestedAt': DateTime.now().millisecondsSinceEpoch,
                         'fareForUser1': minIndex == 0
                             ? newFarePriceForUser1Case1
                             : minIndex == 1
-                            ? newFarePriceForUser1Case2
-                            : minIndex == 2
-                            ? newFarePriceForUser1Case3
-                            : newFarePriceForUser1Case4,
+                                ? newFarePriceForUser1Case2
+                                : minIndex == 2
+                                    ? newFarePriceForUser1Case3
+                                    : newFarePriceForUser1Case4,
                         'fareForUser2': minIndex == 0
                             ? newFarePriceForUser2Case1
                             : minIndex == 1
-                            ? newFarePriceForUser2Case2
-                            : minIndex == 2
-                            ? newFarePriceForUser2Case3
-                            : newFarePriceForUser2Case4,
+                                ? newFarePriceForUser2Case2
+                                : minIndex == 2
+                                    ? newFarePriceForUser2Case3
+                                    : newFarePriceForUser2Case4,
                         'mergePath': mergePath,
                       }).then((value) {
                         onSuccess = true;
                       });
+                    } else {
+                      onSuccess = true;
                     }
                   });
                 });
@@ -558,7 +563,7 @@ class RiderBookingRepository implements IRiderBookingRepository {
                 'requestedAt': DateTime.now().millisecondsSinceEpoch,
                 'fareForUser1': newFarePrice[0],
                 'fareForUser2': newFarePrice[1],
-                'mergePath': '34',
+                'mergePath': '1234',
               }).then((value) {
                 onSuccess = true;
               });
@@ -634,10 +639,12 @@ class RiderBookingRepository implements IRiderBookingRepository {
                       'requestedAt': DateTime.now().millisecondsSinceEpoch,
                       'fareForUser1': newFarePrice[0],
                       'fareForUser2': newFarePrice[1],
-                      'mergePath': '43',
+                      'mergePath': '1243',
                     }).then((value) {
                       onSuccess = true;
                     });
+                  } else {
+                    onSuccess = true;
                   }
                 });
               });
@@ -688,7 +695,7 @@ class RiderBookingRepository implements IRiderBookingRepository {
           .entries
           .toList()
         ..sort((a, b) => a.value.compareTo(b.value));
-      List<MapEntry<int, double>> top10MinValues = sortedList.take(5).toList();
+      List<MapEntry<int, double>> top10MinValues = sortedList.take(10).toList();
       for (int i = 0; i < top10MinValues.length; i++) {
         if (top10MinValues[i].value < 3000) {
           await _firebaseFirestore
@@ -717,6 +724,8 @@ class RiderBookingRepository implements IRiderBookingRepository {
           }).then((value) {
             onSuccess = true;
           });
+        } else {
+          onSuccess = true;
         }
       }
     });
@@ -737,30 +746,43 @@ class RiderBookingRepository implements IRiderBookingRepository {
       await _firebaseFirestore
           .collection('Users')
           .doc(_firebaseAuth.currentUser?.uid)
-          .collection('Request')
-          .get()
-          .then((value) async {
-        if (value.docs.isEmpty) {
-          onSuccess = true;
-        }
-        for (int i = 0; i < value.docs.length; i++) {
-          String driverUid = (value.docs)[i]['driverUid'];
-          await _firebaseFirestore
-              .collection('Driver')
-              .doc(driverUid)
-              .collection('Request')
-              .doc(rideId)
-              .delete();
+          .update({'currentRideId': ''}).then((value) async {
+        await _firebaseFirestore
+            .collection('Users')
+            .doc(_firebaseAuth.currentUser?.uid)
+            .get()
+            .then((value) async {
+          Users users = Users.fromJson(value.data()!);
+          await _usersDao.insertUsersEntity(convertUsersToUsersEntity(users));
           await _firebaseFirestore
               .collection('Users')
               .doc(_firebaseAuth.currentUser?.uid)
               .collection('Request')
-              .doc(driverUid)
-              .delete()
-              .then((value) {
-            onSuccess = true;
+              .get()
+              .then((value) async {
+            if (value.docs.isEmpty) {
+              onSuccess = true;
+            }
+            for (int i = 0; i < value.docs.length; i++) {
+              String driverUid = (value.docs)[i]['driverUid'];
+              await _firebaseFirestore
+                  .collection('Driver')
+                  .doc(driverUid)
+                  .collection('Request')
+                  .doc(rideId)
+                  .delete();
+              await _firebaseFirestore
+                  .collection('Users')
+                  .doc(_firebaseAuth.currentUser?.uid)
+                  .collection('Request')
+                  .doc(driverUid)
+                  .delete()
+                  .then((value) {
+                onSuccess = true;
+              });
+            }
           });
-        }
+        });
       });
     });
     if (onSuccess) {

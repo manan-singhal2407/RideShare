@@ -111,43 +111,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
                           height: 8,
                         ),
                         ListTile(
-                          onTap: () async {
-                            _closeDrawer();
-                            Navigator.pushNamed(
-                              context,
-                              '/driver_profile_screen',
-                              arguments: DriverSettingsScreenArguments(
-                                viewModel.driverSharingOn,
-                              ),
-                            );
-                          },
-                          leading: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: Colors.orange.shade500,
-                            ),
-                            child: const Icon(
-                              Icons.monetization_on_rounded,
-                              size: 24,
-                              color: Colors.white,
-                            ),
-                          ),
-                          title: Text(
-                            'My Earning',
-                            style: GoogleFonts.openSans(
-                              textStyle: const TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        ListTile(
                           onTap: () {
                             _closeDrawer();
                             Navigator.pushNamed(
@@ -163,7 +126,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.red.shade500,
+                              color: Colors.orange.shade500,
                             ),
                             child: const Icon(
                               Icons.timelapse_rounded,
@@ -200,7 +163,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.grey.shade500,
+                              color: Colors.red.shade500,
                             ),
                             child: const Icon(
                               Icons.settings_rounded,
@@ -231,7 +194,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.orange.shade500,
+                              color: Colors.grey.shade500,
                             ),
                             child: const Icon(
                               Icons.support_rounded,
@@ -262,7 +225,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                             height: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: Colors.red.shade500,
+                              color: Colors.orange.shade500,
                             ),
                             child: const Icon(
                               Icons.logout_rounded,
