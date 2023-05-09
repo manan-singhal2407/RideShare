@@ -37,7 +37,7 @@ class DriverHomeViewModel extends ChangeNotifier {
 
   DriverHomeViewModel(this._context) {
     _getDataFromLocalDatabase();
-    _getDataFromDatabase();
+    _getDataFromDatabase(false);
     // todo
     // _getCurrentLocation();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
@@ -79,8 +79,11 @@ class DriverHomeViewModel extends ChangeNotifier {
     });
   }
 
-  void _getDataFromDatabase() async {
+  void _getDataFromDatabase(bool onClickedNext) async {
     await _driverHomeRepository.getDriverDataFromDatabase().then((value) {
+      if (onClickedNext) {
+        Navigator.pop(_context);
+      }
       if (value.data != null) {
         Driver driver = value.data as Driver;
         _driverProfileUrl = driver.profileUrl;
@@ -97,6 +100,11 @@ class DriverHomeViewModel extends ChangeNotifier {
             arguments: DriverRidesScreenArguments(
               driver.currentRideId,
             ),
+          );
+        } else if (onClickedNext) {
+          Navigator.pushNamed(
+            _context,
+            '/driver_ride_request_screen',
           );
         }
       }
@@ -135,10 +143,8 @@ class DriverHomeViewModel extends ChangeNotifier {
   }
 
   void onClickNextButton() async {
-    Navigator.pushNamed(
-      _context,
-      '/driver_ride_request_screen',
-    );
+    showLoadingDialogBox(_context);
+    _getDataFromDatabase(true);
   }
 
   void onClickSetOfflineButton() async {

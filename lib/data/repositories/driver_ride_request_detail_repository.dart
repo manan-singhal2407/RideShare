@@ -19,14 +19,15 @@ class DriverRideRequestDetailRepository
 
   @override
   Future<DataState> acceptRideRequest(String rideId, String userUid) async {
-    Rides? rides;
+    Rides? ridesData;
     bool onRideExists = false;
     await _firebaseFirestore
         .collection('Rides')
         .doc(rideId)
         .get()
         .then((value) async {
-      if (Rides.fromJson(value.data()!).driver == null) {
+      Rides rides = Rides.fromJson(value.data()!);
+      if (rides.driver == null && !rides.cancelledByUser) {
         await _firebaseFirestore
             .collection('Driver')
             .doc(_firebaseAuth.currentUser?.uid)
@@ -52,7 +53,7 @@ class DriverRideRequestDetailRepository
                   .doc(rideId)
                   .get()
                   .then((value) async {
-                rides = Rides.fromJson(value.data()!);
+                ridesData = Rides.fromJson(value.data()!);
                 await _driverDao.insertDriverEntity(
                   convertDriverToDriverEntity(driver),
                 );
@@ -86,10 +87,10 @@ class DriverRideRequestDetailRepository
         onRideExists = true;
       }
     });
-    if (onRideExists) {
-      return DataState.error(null, null);
+    if (!onRideExists) {
+      return DataState.success(ridesData);
     } else {
-      return DataState.success(rides);
+      return DataState.error(null, null);
     }
   }
 

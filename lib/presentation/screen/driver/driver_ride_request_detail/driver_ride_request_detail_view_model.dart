@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:btp/presentation/screen/driver/driver_rides/arguments/driver_rides_screen_arguments.dart';
-import 'package:btp/presentation/theme/color.dart';
-import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../data/network/model/rides.dart';
 import '../../../../domain/repositories/i_driver_ride_request_detail_repository.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
+import '../../../theme/color.dart';
+import '../../../theme/widgets/loading.dart';
+import '../driver_rides/arguments/driver_rides_screen_arguments.dart';
 
 class DriverRideRequestDetailViewModel extends ChangeNotifier {
   final IDriverRideRequestDetailRepository _driverRideRequestDetailRepository =
@@ -21,23 +20,10 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
   final Rides _rides;
 
   final Map<PolylineId, Polyline> _polylines = {};
-  final PolylinePoints _polylinePoints = PolylinePoints();
   Marker? _sourcePosition, _destinationPosition;
 
   DriverRideRequestDetailViewModel(this._context, this._latLng, this._rides) {
-    _sourcePosition = Marker(
-      markerId: const MarkerId('source'),
-      position: _latLng,
-    );
-    _destinationPosition = Marker(
-      markerId: const MarkerId('destination'),
-      position: LatLng(
-        _rides.pickupUser1Latitude,
-        _rides.pickupUser1Longitude,
-      ),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    );
-    _getPolylinesBetweenSourceAndDestination();
+    _getPolylinesAndMarker();
   }
 
   Map<PolylineId, Polyline> get polylines => _polylines;
@@ -46,31 +32,38 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
 
   Marker? get destinationPosition => _destinationPosition;
 
-  void _getPolylinesBetweenSourceAndDestination() async {
-    List<LatLng> polylineCoordinates = [];
-    List<dynamic> points = [];
-    PolylineResult result = await _polylinePoints.getRouteBetweenCoordinates(
-      googleMapsApiKey,
-      PointLatLng(_latLng.latitude, _latLng.longitude),
-      PointLatLng(_rides.pickupUser1Latitude, _rides.pickupUser1Longitude),
-      travelMode: TravelMode.driving,
+  void _getPolylinesAndMarker() async {
+    _sourcePosition = Marker(
+      markerId: const MarkerId('source'),
+      position: _latLng,
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_pickup.png',
+          100,
+        ),
+      ),
     );
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        points.add({'lat': point.latitude, 'lng': point.longitude});
-      }
-    }
-
-    PolylineId id = const PolylineId('route');
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.blue.withOpacity(0.8),
-      points: polylineCoordinates,
-      width: 4,
+    _destinationPosition = Marker(
+      markerId: const MarkerId('destination'),
+      position: LatLng(
+        _rides.pickupUser1Latitude,
+        _rides.pickupUser1Longitude,
+      ),
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_destination.png',
+          100,
+        ),
+      ),
     );
-    _polylines[id] = polyline;
     notifyListeners();
+    await getPolylineBetweenTwoPoints(
+      _latLng,
+      LatLng(_rides.pickupUser1Latitude, _rides.pickupUser1Longitude),
+    ).then((value) async {
+      _polylines[value.polylineId] = value;
+      notifyListeners();
+    });
   }
 
   void onAcceptRequest() async {
@@ -89,12 +82,12 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
           ),
         );
       } else {
+        Navigator.pop(_context);
         showScaffoldMessenger(
           _context,
           'This ride does not exist any more',
           errorStateColor,
         );
-        Navigator.pop(_context);
       }
     }).onError((error, stackTrace) {
       Navigator.pop(_context);

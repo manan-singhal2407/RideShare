@@ -5,9 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../extension/utils_extension.dart';
 import '../../../theme/color.dart';
 import '../../../theme/widgets/app_bar.dart';
+import '../../../theme/widgets/empty_state.dart';
 import 'driver_ride_request_view_model.dart';
-
-// todo empty layout
 
 class DriverRideRequestPage extends StatefulWidget {
   const DriverRideRequestPage({super.key});
@@ -34,7 +33,10 @@ class _DriverRideRequestPageState extends State<DriverRideRequestPage> {
                     ),
                   )
                 : viewModel.ridesRequestData.isEmpty
-                    ? Text('')
+                    ? const EmptyState(
+                        primaryText: 'No current rides found',
+                        secondaryText: '',
+                      )
                     : _DriverRideRequestViewLayout(viewModel: viewModel),
           );
         },
@@ -117,105 +119,124 @@ class _DriverRideRequestViewLayoutState
                   Row(
                     children: [
                       const SizedBox(
-                        width: 4,
+                        width: 8,
                       ),
-                      const Icon(
-                        Icons.location_on_sharp,
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        '${rides[2]} (${rides[1]} km) away',
-                        style: GoogleFonts.openSans(
-                          textStyle: const TextStyle(
-                            color: primaryTextColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 1,
+                            height: 4,
+                            color: Colors.transparent,
                           ),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 36,
-                      ),
-                      Text(
-                        rides[3].toString(),
-                        style: GoogleFonts.openSans(
-                          textStyle: const TextStyle(
-                            color: secondaryTextColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: successStateColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      const Icon(
-                        Icons.location_on_sharp,
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        '${rides[5]} (${rides[4]} km) trip',
-                        style: GoogleFonts.openSans(
-                          textStyle: const TextStyle(
-                            color: primaryTextColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                          Container(
+                            width: 1,
+                            height: 36,
+                            margin: const EdgeInsets.only(left: 4.5),
+                            color: Colors.grey,
                           ),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 36,
-                      ),
-                      Text(
-                        rides[6].toString(),
-                        style: GoogleFonts.openSans(
-                          textStyle: const TextStyle(
-                            color: secondaryTextColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: errorStateColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                          Container(
+                            width: 1,
+                            height: 26,
+                            color: Colors.transparent,
+                          ),
+                        ],
                       ),
                       const SizedBox(
-                        width: 12,
+                        width: 16,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 150,
+                            height: 18,
+                            child: Text(
+                              '${rides[2]} (${rides[1]} km) away',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 140,
+                            height: 20,
+                            child: Text(
+                              rides[3].toString(),
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: secondaryTextColor,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 150,
+                            height: 18,
+                            child: Text(
+                              '${rides[5]} (${rides[4]} km) trip',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 140,
+                            height: 20,
+                            child: Text(
+                              rides[6].toString(),
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: secondaryTextColor,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 20,
                       ),
                     ],
                   ),

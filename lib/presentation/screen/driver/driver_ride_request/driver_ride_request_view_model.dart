@@ -81,7 +81,7 @@ class DriverRideRequestViewModel extends ChangeNotifier {
               ),
             ).then((value2) {
               _ridesRequestData.add([
-                _ridesList[i].fareReceivedByDriver.toDouble(),
+                _ridesList[i].initialFareReceivedByDriver.toDouble(),
                 getMToKmFormattedNumber(value1[0]),
                 getSecToTimeFormattedNumber(value1[1].toInt()),
                 _ridesList[i].pickupUser1Address,
@@ -94,9 +94,6 @@ class DriverRideRequestViewModel extends ChangeNotifier {
                 notifyListeners();
               }
             });
-          }).onError((error, stackTrace) {
-            // todo
-            debugPrint('Manan Error1: $error');
           });
         }
       }
