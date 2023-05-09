@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:btp/domain/enums/account_type_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -118,6 +119,17 @@ void showScaffoldMessenger(
       backgroundColor: backgroundColor,
     ),
   );
+}
+
+void openHomeScreenAndClearStack(
+  BuildContext context,
+  AccountTypeEnum accountTypeEnum,
+) {
+  if (accountTypeEnum == AccountTypeEnum.driver) {
+    Navigator.pushNamedAndRemoveUntil(context, '/driver_home_screen', (r) => false);
+  } else if (accountTypeEnum == AccountTypeEnum.user) {
+    Navigator.pushNamedAndRemoveUntil(context, '/rider_home_screen', (r) => false);
+  }
 }
 
 void redirectUserToEmail() async {

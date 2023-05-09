@@ -1,0 +1,4 @@
+enum PhoneAuthEnum {
+  login,
+  register,
+}

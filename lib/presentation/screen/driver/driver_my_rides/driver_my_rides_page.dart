@@ -20,7 +20,7 @@ class _DriverMyRidesPageState extends State<DriverMyRidesPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<DriverMyRidesViewModel>(
-      create: (context) => DriverMyRidesViewModel(context),
+      create: (context) => DriverMyRidesViewModel(),
       child: Consumer<DriverMyRidesViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
@@ -40,7 +40,7 @@ class _DriverMyRidesPageState extends State<DriverMyRidesPage> {
                       )
                     : ListView.builder(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         itemCount: viewModel.ridesList.length,
                         itemBuilder: (context, index) {
                           return Column(

@@ -8,12 +8,10 @@ class DriverMyRidesViewModel extends ChangeNotifier {
   final IDriverMyRidesRepository _driverMyRidesRepository =
       getIt<IDriverMyRidesRepository>();
 
-  final BuildContext _context;
-
   bool _isLoadingData = true;
   List<Rides> _ridesList = [];
 
-  DriverMyRidesViewModel(this._context) {
+  DriverMyRidesViewModel() {
     retrievePreviousRidesFromQuery();
   }
 

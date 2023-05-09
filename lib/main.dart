@@ -9,6 +9,8 @@ import 'package:btp/presentation/screen/driver/driver_rides/driver_rides_page.da
 import 'package:btp/presentation/screen/driver/driver_settings/arguments/driver_settings_screen_arguments.dart';
 import 'package:btp/presentation/screen/driver/driver_settings/driver_settings_page.dart';
 import 'package:btp/presentation/screen/login/login_page.dart';
+import 'package:btp/presentation/screen/phone_otp/arguments/phone_otp_screen_arguments.dart';
+import 'package:btp/presentation/screen/phone_otp/phone_otp_page.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/screen/rider/rider_home/rider_home_page.dart';
@@ -62,7 +64,20 @@ class MyApp extends StatelessWidget {
         '/driver_my_rides_screen': (context) => const DriverMyRidesPage(),
       },
       onGenerateRoute: (settings) {
-        if (settings.name == '/rider/search_screen') {
+        if (settings.name == '/phone_otp_screen') {
+          final arguments = settings.arguments as PhoneOtpScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return PhoneOtpPage(
+                name: arguments.name,
+                phoneNumber: arguments.phoneNumber,
+                countryCode: arguments.countryCode,
+                phoneAuthEnum: arguments.phoneAuthEnum,
+                accountTypeEnum: arguments.accountTypeEnum,
+              );
+            },
+          );
+        } else if (settings.name == '/rider/search_screen') {
           final arguments = settings.arguments as SearchScreenArguments;
           return MaterialPageRoute(
             builder: (context) {
