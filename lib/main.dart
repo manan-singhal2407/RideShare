@@ -14,6 +14,7 @@ import 'package:btp/presentation/screen/phone_otp/phone_otp_page.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/screen/rider/rider_home/rider_home_page.dart';
+import 'package:btp/presentation/screen/rider/rider_my_rides/rider_my_rides_page.dart';
 import 'package:btp/presentation/screen/rider/rider_rides/arguments/rider_rides_screen_arguments.dart';
 import 'package:btp/presentation/screen/rider/rider_rides/rider_rides_page.dart';
 import 'package:btp/presentation/screen/rider/rider_settings/arguments/rider_settings_screen_arguments.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         '/splash_screen': (context) => const SplashPage(),
         '/login_screen': (context) => const LoginPage(),
         '/rider_home_screen': (context) => const RiderHomePage(),
+        '/rider_my_rides_screen': (context) => const RiderMyRidesPage(),
         '/driver_home_screen': (context) => const DriverHomePage(),
         '/driver_ride_request_screen': (context) => const DriverRideRequestPage(),
         '/driver_my_rides_screen': (context) => const DriverMyRidesPage(),

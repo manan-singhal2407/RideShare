@@ -660,7 +660,6 @@ class RiderBookingRepository implements IRiderBookingRepository {
         .collection('Driver')
         .where('isDrivingOn', isEqualTo: true)
         .where('isSinglePersonInCar', isEqualTo: false)
-        .where('cancelledByUser', isEqualTo: false)
         .get()
         .then((value) async {
       List<Driver> driverList = [];

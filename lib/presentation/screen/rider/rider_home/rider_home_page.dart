@@ -268,10 +268,9 @@ class _RiderHomePageState extends State<RiderHomePage> {
                         ListTile(
                           onTap: () {
                             _closeDrawer();
-                            showScaffoldMessenger(
+                            Navigator.pushNamed(
                               context,
-                              'My Rides',
-                              primaryTextColor,
+                              '/rider_my_rides_screen',
                             );
                           },
                           leading: Container(
