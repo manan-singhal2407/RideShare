@@ -9,6 +9,7 @@ import '../../domain/state/data_state.dart';
 import '../../presentation/base/injectable.dart';
 import '../network/model/driver.dart';
 import '../network/model/rides.dart';
+import '../network/model/users.dart';
 
 @Injectable(as: IRiderRidesRepository)
 class RiderRidesRepository implements IRiderRidesRepository {
@@ -37,27 +38,51 @@ class RiderRidesRepository implements IRiderRidesRepository {
 
   @override
   Future<DataState> updateRatingAndRemoveCurrentRideId(
-    String driverUid,
+    Rides rides,
     int rating,
   ) async {
     bool onSuccess = false;
     await _firebaseFirestore
         .collection('Driver')
-        .doc(driverUid)
+        .doc(rides.driver?.driverUid)
         .get()
         .then((value) async {
       Driver driver = Driver.fromJson(value.data()!);
       await _firebaseFirestore
           .collection('Driver')
-          .doc(driverUid)
-          .update({'driverRating': driver.driverRating + rating, 'driverRatedRides': driver.driverRatedRides + 1})
-          .then((value) async {
+          .doc(rides.driver?.driverUid)
+          .update({
+        'driverRating': driver.driverRating + rating,
+        'driverRatedRides': driver.driverRatedRides + 1
+      }).then((value) async {
         await _firebaseFirestore
             .collection('Users')
             .doc(_firebaseAuth.currentUser?.uid)
-            .update({'currentRideId': ''})
-            .then((value) {
-          onSuccess = true;
+            .get()
+            .then((value) async {
+          Users users = Users.fromJson(value.data()!);
+          await _firebaseFirestore
+              .collection('Users')
+              .doc(_firebaseAuth.currentUser?.uid)
+              .update({
+            'currentRideId': '',
+            'sharedRides': users.sharedRides + (rides.user2 != null ? 1 : 0),
+            'totalRides': users.totalRides + 1,
+            'totalFare': users.totalFare +
+                (rides.user1?.userUid == _firebaseAuth.currentUser?.uid
+                    ? rides.user2 != null
+                        ? rides.farePriceForUser1
+                        : rides.initialFareForUser1
+                    : rides.farePriceForUser2),
+            'totalAmountSaved': users.totalAmountSaved +
+                (rides.user2 != null
+                    ? (rides.user1?.userUid == _firebaseAuth.currentUser?.uid
+                        ? rides.initialFareForUser1 - rides.farePriceForUser1
+                        : rides.initialFareForUser2 - rides.farePriceForUser2)
+                    : 0),
+          }).then((value) {
+            onSuccess = true;
+          });
         });
       });
     });

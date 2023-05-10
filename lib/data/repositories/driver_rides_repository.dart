@@ -221,6 +221,7 @@ class DriverRidesRepository implements IDriverRidesRepository {
           driver.totalRides += 1;
           driver.sharedRides += isRideShared ? 1 : 0;
           driver.currentRideId = '';
+          driver.isSinglePersonInCar = false;
           await _firebaseFirestore
               .collection('Driver')
               .doc(_firebaseAuth.currentUser?.uid)

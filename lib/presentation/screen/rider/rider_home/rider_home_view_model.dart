@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:btp/domain/extension/model_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,10 +8,12 @@ import 'package:location/location.dart' as loc;
 
 import '../../../../data/cache/database/entities/users_entity.dart';
 import '../../../../data/network/model/users.dart';
+import '../../../../domain/extension/model_extension.dart';
 import '../../../../domain/repositories/i_rider_home_repository.dart';
 import '../../../base/injectable.dart';
 import '../../../extension/utils_extension.dart';
 import '../../../theme/widgets/loading.dart';
+import '../../search/arguments/search_screen_arguments.dart';
 import '../rider_booking/arguments/rider_booking_screen_arguments.dart';
 
 class RiderHomeViewModel extends ChangeNotifier {
@@ -28,6 +29,8 @@ class RiderHomeViewModel extends ChangeNotifier {
   String? _pickUpLocationAddress;
   Marker? _sourcePosition;
 
+  bool _isPreviousRideExist = false;
+
   String _riderProfileUrl = '';
   String _riderName = '';
   String _riderPhoneNumber = '';
@@ -35,7 +38,7 @@ class RiderHomeViewModel extends ChangeNotifier {
 
   RiderHomeViewModel(this._context) {
     _getDataFromLocalDatabase();
-    _getDataFromDatabase();
+    getDataFromDatabase('');
     _getCurrentLocation();
   }
 
@@ -70,8 +73,14 @@ class RiderHomeViewModel extends ChangeNotifier {
     });
   }
 
-  void _getDataFromDatabase() async {
+  void getDataFromDatabase(String route) async {
+    if (_isPreviousRideExist) {
+      showLoadingDialogBox(_context);
+    }
     await _riderHomeRepository.getUserDataFromDatabase().then((value) {
+      if (_isPreviousRideExist) {
+        Navigator.pop(_context);
+      }
       if (value.data != null) {
         _users = value.data as Users;
         _riderProfileUrl = (_users?.profileUrl)!;
@@ -80,6 +89,7 @@ class RiderHomeViewModel extends ChangeNotifier {
         notifyListeners();
 
         if ((_users?.currentRideId)!.isNotEmpty) {
+          _isPreviousRideExist = true;
           Navigator.pushNamed(
             _context,
             '/rider_booking_screen',
@@ -92,6 +102,20 @@ class RiderHomeViewModel extends ChangeNotifier {
               defaultLatLng,
             ),
           );
+        } else if (_isPreviousRideExist) {
+          _isPreviousRideExist = false;
+          Navigator.pushNamed(
+            _context,
+            '/rider/search_screen',
+            arguments: SearchScreenArguments(
+              route,
+              _pickUpLocation,
+            ),
+          ).then((result) async {
+            if (result != null) {
+              onAddressSelect(result);
+            }
+          });
         }
       }
     });
@@ -152,13 +176,21 @@ class RiderHomeViewModel extends ChangeNotifier {
     _sourcePosition = Marker(
       markerId: const MarkerId('source'),
       position: _pickUpLocation,
+      icon: BitmapDescriptor.fromBytes(
+        await getUint8ListImages(
+          'assets/images/ic_marker_pickup.png',
+          50,
+        ),
+      ),
     );
     notifyListeners();
   }
 
   void openCaptainVerificationPage() async {
     showLoadingDialogBox(_context);
-    await _riderHomeRepository.createUserToDriver(_pickUpLocation).then((value) {
+    await _riderHomeRepository
+        .createUserToDriver(_pickUpLocation)
+        .then((value) {
       if (value.data != null) {
         Navigator.pushNamedAndRemoveUntil(
           _context,

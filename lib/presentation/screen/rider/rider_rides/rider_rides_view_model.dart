@@ -23,6 +23,7 @@ class RiderRidesViewModel extends ChangeNotifier {
 
   bool _isLoadingRideInfo = true;
   Rides? _rides;
+  bool _isThisAUser1 = false;
   StreamSubscription<DataState>? _streamSubscription;
   final StreamController<DataState> _streamController =
       StreamController<DataState>.broadcast();
@@ -53,7 +54,7 @@ class RiderRidesViewModel extends ChangeNotifier {
     _streamSubscription = _streamController.stream.listen((value) async {
       if (value.data != null) {
         _rides = (value.data)[0] as Rides;
-        bool isThisAUser1 = (value.data)[1] as bool;
+        _isThisAUser1 = (value.data)[1] as bool;
         _isLoadingRideInfo = false;
         _screenMarker.clear();
         _screenMarker.add(Marker(
@@ -81,7 +82,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_position${mergePath[0]}.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -94,7 +95,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_position${mergePath[1]}.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -107,7 +108,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_position${mergePath[2]}.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -120,7 +121,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_position${mergePath[3]}.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -176,7 +177,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_pickup.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -189,7 +190,7 @@ class RiderRidesViewModel extends ChangeNotifier {
             icon: BitmapDescriptor.fromBytes(
               await getUint8ListImages(
                 'assets/images/ic_marker_destination.png',
-                100,
+                50,
               ),
             ),
           ));
@@ -201,7 +202,7 @@ class RiderRidesViewModel extends ChangeNotifier {
           }
         }
 
-        if (isThisAUser1) {
+        if (_isThisAUser1) {
           if (_rides?.reachedDestinationUser1At != 0) {
             _showFeedbackBottomSheet();
           }
@@ -374,7 +375,7 @@ class RiderRidesViewModel extends ChangeNotifier {
                     onPressed: () async {
                       _riderRidesRepository
                           .updateRatingAndRemoveCurrentRideId(
-                        (_rides?.driver?.driverUid)!,
+                        _rides!,
                         _ratingToDriver,
                       )
                           .then((value) {
@@ -473,65 +474,38 @@ class RiderRidesViewModel extends ChangeNotifier {
                   const SizedBox(
                     width: 16,
                   ),
-                  Expanded(child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: DateFormat.Hm().format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                              (_rides?.idealTimeToDropUser1)!.toInt(),
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: DateFormat.Hm().format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                _isThisAUser1 ? (_rides?.initialFareForUser1)!.toInt() : (_rides?.initialFareForUser2)!.toInt(),
+                              ),
+                            ),
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: secondaryTextColor,
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              color: secondaryTextColor,
-                              decoration: TextDecoration.lineThrough,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          TextSpan(
+                            text:
+                                '  ${getCurrencyFormattedNumber((_isThisAUser1 ? (_rides?.farePriceForUser1)!.toDouble() : (_rides?.farePriceForUser2)!.toDouble()))}',
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        TextSpan(
-                          text:
-                          '  ${getCurrencyFormattedNumber((_rides?.farePriceForUser1)!.toDouble())}',
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              color: primaryTextColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: getCurrencyFormattedNumber(
-                              (_rides?.initialFareForUser1)!.toDouble()),
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              color: secondaryTextColor,
-                              decoration: TextDecoration.lineThrough,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        TextSpan(
-                          text:
-                              '  ${getCurrencyFormattedNumber((_rides?.farePriceForUser1)!.toDouble())}',
-                          style: GoogleFonts.openSans(
-                            textStyle: const TextStyle(
-                              color: primaryTextColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -548,7 +522,7 @@ class RiderRidesViewModel extends ChangeNotifier {
                   Expanded(
                     child: Text(
                       getCurrencyFormattedNumber(
-                          (_rides?.farePriceForUser1)!.toDouble()),
+                          (_rides?.initialFareForUser1)!.toDouble()),
                       style: GoogleFonts.openSans(
                         textStyle: const TextStyle(
                           color: primaryTextColor,
@@ -690,222 +664,466 @@ class RiderRidesViewModel extends ChangeNotifier {
             const SizedBox(
               height: 20,
             ),
-            if (_rides?.user2 != null) ...[
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  Container(
-                    width: 10,
-                    height: 10,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                  Text(
-                    ' away',
-                    style: GoogleFonts.openSans(
-                      textStyle: const TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                ],
-              ),
-            ] else ...[
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Container(
-                    width: 10,
-                    height: 10,
-                    color: Colors.green,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                  Text(
-                    '${_rides?.pickupUser1Address}',
-                    style: GoogleFonts.openSans(
-                      textStyle: const TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Container(
-                    width: 10,
-                    height: 10,
-                    color: Colors.red,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                  Text(
-                    '${_rides?.destinationUser1Address}',
-                    style: GoogleFonts.openSans(
-                      textStyle: const TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                ],
-              ),
-            ],
             Row(
               children: [
                 const SizedBox(
-                  width: 4,
+                  width: 20,
                 ),
-                Container(
-                  width: 10,
-                  height: 10,
-                  color: Colors.black,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if ((_rides?.mergePath)!.isEmpty) ...[
+                      Container(
+                        width: 1,
+                        height: 4,
+                        color: Colors.transparent,
+                      ),
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: successStateColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        margin: const EdgeInsets.only(left: 4.5),
+                        color: Colors.grey,
+                      ),
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: errorStateColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 26,
+                        color: Colors.transparent,
+                      ),
+                    ] else ...[
+                      if (_rides?.mergePath[0] == '1') ...[
+                        Container(
+                          width: 1,
+                          height: 4,
+                          color: Colors.transparent,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: successStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? '' : 'O',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 30,
+                          margin: const EdgeInsets.only(left: 4.5),
+                          color: Colors.grey,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: successStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? 'O' : '',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        Container(
+                          width: 1,
+                          height: 4,
+                          color: Colors.transparent,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: successStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? 'O' : '',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 30,
+                          margin: const EdgeInsets.only(left: 4.5),
+                          color: Colors.grey,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: successStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? '' : 'O',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
+                      Container(
+                        width: 1,
+                        height: 30,
+                        margin: const EdgeInsets.only(left: 4.5),
+                        color: Colors.grey,
+                      ),
+                      if (_rides?.mergePath[0] == '3') ...[
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: errorStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? '' : 'O',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 30,
+                          margin: const EdgeInsets.only(left: 4.5),
+                          color: Colors.grey,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: errorStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? 'O' : '',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 26,
+                          color: Colors.transparent,
+                        ),
+                      ] else ...[
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: errorStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? 'O' : '',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 30,
+                          margin: const EdgeInsets.only(left: 4.5),
+                          color: Colors.grey,
+                        ),
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: errorStateColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _isThisAUser1 ? '' : 'O',
+                              style: GoogleFonts.openSans(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 26,
+                          color: Colors.transparent,
+                        ),
+                      ],
+                    ],
+                  ],
                 ),
                 const SizedBox(
-                  width: 12,
+                  width: 8,
                 ),
-                Text(
-                  ' away',
-                  style: GoogleFonts.openSans(
-                    textStyle: const TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if ((_rides?.mergePath)!.isEmpty) ...[
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 100,
+                        height: 40,
+                        child: Text(
+                          (_rides?.pickupUser1Address)!,
+                          style: GoogleFonts.openSans(
+                            textStyle: const TextStyle(
+                              color: primaryTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 100,
+                        height: 40,
+                        child: Text(
+                          (_rides?.destinationUser1Address)!,
+                          style: GoogleFonts.openSans(
+                            textStyle: const TextStyle(
+                              color: primaryTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ] else ...[
+                      if (_rides?.mergePath[0] == '1') ...[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.pickupUser1Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.pickupUser2Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ] else ...[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.pickupUser2Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.pickupUser1Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                      if (_rides?.mergePath[0] == '3') ...[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.destinationUser1Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.destinationUser2Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ] else ...[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.destinationUser2Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 100,
+                          height: 40,
+                          child: Text(
+                            (_rides?.destinationUser1Address)!,
+                            style: GoogleFonts.openSans(
+                              textStyle: const TextStyle(
+                                color: primaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ],
                 ),
                 const SizedBox(
-                  width: 12,
+                  width: 20,
                 ),
               ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
-              ),
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  color: Colors.purple,
-                ),
-                child: _rides?.driver?.profileUrl == ''
-                    ? const Icon(
-                        Icons.person_rounded,
-                        size: 32,
-                      )
-                    : Image.network(
-                        (_rides?.driver?.profileUrl)!,
-                        width: 32,
-                        height: 32,
-                      ),
-              ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                'Rate your experience with ${_rides?.driver?.driverName}?',
-                style: GoogleFonts.openSans(
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    color: secondaryTextColor,
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            RatingBar.builder(
-              initialRating: 0,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: false,
-              itemCount: 5,
-              itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-              itemBuilder: (context, _) => const Icon(
-                Icons.star,
-                color: Colors.amber,
-              ),
-              onRatingUpdate: (rating) {
-                _ratingToDriver = rating.toInt();
-              },
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Center(
-              child: SecondaryAppButton(
-                width: 120,
-                text: 'Done',
-                onPressed: () async {
-                  _riderRidesRepository
-                      .updateRatingAndRemoveCurrentRideId(
-                    (_rides?.driver?.driverUid)!,
-                    _ratingToDriver,
-                  )
-                      .then((value) {
-                    if (value.data != null) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/rider_home_screen',
-                        (r) => false,
-                      );
-                    }
-                  });
-                },
-              ),
-            ),
-            const SizedBox(
-              height: 12,
             ),
           ],
         );

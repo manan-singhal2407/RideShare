@@ -97,13 +97,6 @@ class PhoneOtpViewModel extends ChangeNotifier {
           errorStateColor,
         );
       }
-    }).onError((error, stackTrace) {
-      Navigator.pop(_context);
-      showScaffoldMessenger(
-        _context,
-        'Something went wrong',
-        errorStateColor,
-      );
     });
   }
 

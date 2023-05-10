@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../data/network/model/rides.dart';
 import '../../domain/state/data_state.dart';
 
 abstract class IRiderRidesRepository {
@@ -9,7 +10,7 @@ abstract class IRiderRidesRepository {
   );
 
   Future<DataState> updateRatingAndRemoveCurrentRideId(
-    String driverUid,
+    Rides rides,
     int rating,
   );
 }

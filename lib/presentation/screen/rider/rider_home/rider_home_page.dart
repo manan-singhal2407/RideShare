@@ -1,3 +1,4 @@
+import 'package:btp/presentation/theme/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -105,18 +106,7 @@ class _RiderHomePageState extends State<RiderHomePage> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/rider/search_screen',
-                                    arguments: SearchScreenArguments(
-                                      'pickup',
-                                      viewModel.pickUpLocation,
-                                    ),
-                                  ).then((result) async {
-                                    if (result != null) {
-                                      viewModel.onAddressSelect(result);
-                                    }
-                                  });
+                                  viewModel.getDataFromDatabase('pickup');
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -154,14 +144,7 @@ class _RiderHomePageState extends State<RiderHomePage> {
                   padding: const EdgeInsets.all(12),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/rider/search_screen',
-                        arguments: SearchScreenArguments(
-                          'destination',
-                          viewModel.pickUpLocation,
-                        ),
-                      );
+                      viewModel.getDataFromDatabase('destination');
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(

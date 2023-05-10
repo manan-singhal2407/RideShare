@@ -118,7 +118,6 @@ class RiderBookingViewModel extends ChangeNotifier {
       if (value.data != null) {
         Rides rides = value.data as Rides;
         _rides = rides;
-        _isLoadingRideInfo = false;
         if (rides.driver != null) {
           Navigator.pushReplacementNamed(
             _context,
@@ -128,6 +127,7 @@ class RiderBookingViewModel extends ChangeNotifier {
             ),
           );
         } else {
+          _isLoadingRideInfo = false;
           _pickupLatLng = LatLng(
             rides.pickupUser1Latitude,
             rides.pickupUser1Longitude,
@@ -153,7 +153,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       icon: BitmapDescriptor.fromBytes(
         await getUint8ListImages(
           'assets/images/ic_marker_pickup.png',
-          100,
+          50,
         ),
       ),
     );
@@ -163,7 +163,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       icon: BitmapDescriptor.fromBytes(
         await getUint8ListImages(
           'assets/images/ic_marker_destination.png',
-          100,
+          50,
         ),
       ),
     );
@@ -344,7 +344,7 @@ class RiderBookingViewModel extends ChangeNotifier {
     await _riderBookingRepository
         .sendRideRequestForSharedDriver(rides)
         .then((value) async {
-      _delayedFreeDriverCall = Timer(const Duration(seconds: 5), () {
+      _delayedFreeDriverCall = Timer(const Duration(seconds: 20), () {
         _loadingViewValues[2] = 1;
         _loadingViewValues[3] = null;
         notifyListeners();
@@ -358,7 +358,7 @@ class RiderBookingViewModel extends ChangeNotifier {
         .sendRideRequestForFreeDriver(rides)
         .then((value) async {
       if (value.data != null) {
-        _delayedCancelButtonOption = Timer(const Duration(seconds: 5), () {
+        _delayedCancelButtonOption = Timer(const Duration(seconds: 30), () {
           _showCarBookingCancelButton = true;
           notifyListeners();
         });
