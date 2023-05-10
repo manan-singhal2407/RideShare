@@ -50,6 +50,8 @@ class RiderHomeViewModel extends ChangeNotifier {
 
   Marker? get sourcePosition => _sourcePosition;
 
+  bool get isPreviousRideExist => _isPreviousRideExist;
+
   String get riderProfileUrl => _riderProfileUrl;
 
   String get riderName => _riderName;

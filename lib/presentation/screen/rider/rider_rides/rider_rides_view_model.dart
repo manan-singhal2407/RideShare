@@ -449,7 +449,7 @@ class RiderRidesViewModel extends ChangeNotifier {
                   ),
                 ),
                 Text(
-                  'Drop off',
+                  _rides?.user2 == null ? 'Drop off' : '',
                   style: GoogleFonts.openSans(
                     textStyle: const TextStyle(
                       color: primaryTextColor,
@@ -479,10 +479,10 @@ class RiderRidesViewModel extends ChangeNotifier {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: DateFormat.Hm().format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                _isThisAUser1 ? (_rides?.initialFareForUser1)!.toInt() : (_rides?.initialFareForUser2)!.toInt(),
-                              ),
+                            text: getCurrencyFormattedNumber(
+                              _isThisAUser1
+                                  ? (_rides?.initialFareForUser1)!.toDouble()
+                                  : (_rides?.initialFareForUser2)!.toDouble(),
                             ),
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(

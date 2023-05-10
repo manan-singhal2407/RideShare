@@ -249,7 +249,7 @@ class RiderBookingViewModel extends ChangeNotifier {
       0,
       (_distanceBetweenSourceAndDestination / 50) + 15,
       0,
-      _distanceBetweenSourceAndDestination / 50,
+      (_distanceBetweenSourceAndDestination / 50) + 15,
       0,
       0,
       0,

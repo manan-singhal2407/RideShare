@@ -38,8 +38,8 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
       position: _latLng,
       icon: BitmapDescriptor.fromBytes(
         await getUint8ListImages(
-          'assets/images/ic_marker_pickup.png',
-          50,
+          'assets/images/ic_marker_driver.png',
+          100,
         ),
       ),
     );
@@ -51,7 +51,7 @@ class DriverRideRequestDetailViewModel extends ChangeNotifier {
       ),
       icon: BitmapDescriptor.fromBytes(
         await getUint8ListImages(
-          'assets/images/ic_marker_destination.png',
+          'assets/images/ic_marker_pickup.png',
           50,
         ),
       ),
