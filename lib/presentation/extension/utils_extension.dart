@@ -13,8 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/network/service/retrofit_service.dart';
 import '../base/injectable.dart';
+import 'google_maps_api_key.dart';
 
-String googleMapsApiKey = 'AIzaSyDschydseXpu7lOGtBorLzIzWl-rEr2a24';
 LatLng defaultLatLng = const LatLng(30.7333, 76.7794);
 
 final RestClient _restClient = getIt<RestClient>();

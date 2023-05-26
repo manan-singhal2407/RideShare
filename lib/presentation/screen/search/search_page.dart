@@ -1,6 +1,5 @@
-import 'package:btp/presentation/extension/utils_extension.dart';
+import 'package:btp/presentation/extension/google_maps_api_key.dart';
 import 'package:btp/presentation/screen/rider/rider_booking/arguments/rider_booking_screen_arguments.dart';
-import 'package:btp/presentation/screen/rider/rider_booking/rider_booking_page.dart';
 import 'package:btp/presentation/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
